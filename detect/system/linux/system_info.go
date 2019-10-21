@@ -3,10 +3,10 @@ package system
 import (
 	"bytes"
 	"fmt"
-	tools "go-mycode/Tools"
 	"os/exec"
 	"strconv"
 	"strings"
+	tools "system_detect/tools"
 )
 
 /**

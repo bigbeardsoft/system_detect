@@ -3,11 +3,11 @@ package process
 import (
 	"bytes"
 	"fmt"
-	"health_detect/tools"
 	"log"
 	"os/exec"
 	"strconv"
 	"strings"
+	tools "system_detect/tools"
 )
 
 //Process 获取系统的进程信息

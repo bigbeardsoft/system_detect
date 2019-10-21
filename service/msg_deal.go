@@ -1,7 +1,7 @@
 package service
 
 import (
-	tools "go-mycode/tools"
+	tools "system_detect/tools"
 	"sync"
 )
 
