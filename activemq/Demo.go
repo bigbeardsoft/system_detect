@@ -6,7 +6,6 @@ import (
 	"net"
 	"os"
 	"strconv"
-	"system_detect/activemq"
 
 	"github.com/go-stomp/stomp"
 )
@@ -46,11 +45,11 @@ func receiveFromMq(queue string, conn *stomp.Conn) {
 
 }
 
-func (demo Demo) send(msg, queueName string, conn *stomp.Conn) {
+func send(msg, queueName string, conn *stomp.Conn) {
 	activeMqProducer(msg, queueName, conn)
 }
 
-func (demo Demo) doAcitveMQDemo() *stomp.Conn {
+func doAcitveMQDemo() *stomp.Conn {
 
 	host := "127.0.0.1"
 	port := "61613"
@@ -79,7 +78,7 @@ func (demo Demo) doAcitveMQDemo() *stomp.Conn {
 	return activeMq
 }
 
-func callActiveMq() {
+func CallActiveMq() {
 	//host, port, user, pwd := "127.0.0.1", "61613", "admin", "123456"
 	println("please input host:")
 	inputReader := bufio.NewReader(os.Stdin)
@@ -95,12 +94,12 @@ func callActiveMq() {
 	b, _, _ = inputReader.ReadLine()
 	pwd := string(b)
 	var queues = []string{"SPF300006", "QueueA"}
-	ConnectToServerB(host, port, user, pwd, queues)
+	connectToServerB(host, port, user, pwd, queues)
 }
 
 func connectToServerB(host, port, user, pwd string, queues []string) {
-	var a *activemq.MsgQueue // = &activemq.MsgQueue
-	var b activemq.MsgQueue
+	var a *MsgQueue
+	var b MsgQueue
 	a = &b
 	a.Host = "aaaa"
 	a.Port = "12312"
@@ -146,5 +145,5 @@ func connectToServerB(host, port, user, pwd string, queues []string) {
 }
 
 func main() {
-	callActiveMq()
+	CallActiveMq()
 }

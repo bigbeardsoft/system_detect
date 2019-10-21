@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"system_detect/activemq"
 	"system_detect/detect/process"
 	"system_detect/service"
 )
@@ -15,6 +16,7 @@ func main() {
 	msg2 := service.CreateRegisterMsg("A10103")
 	println(msg2)
 	service.DispatherMsg(msg2)
+	activemq.CallActiveMq()
 }
 
 func readConfig() {

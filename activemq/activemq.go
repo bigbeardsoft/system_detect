@@ -22,7 +22,7 @@ type MsgQueue struct {
 // host:主机地址
 // port:连接端口
 func (msgQueue *MsgQueue) Connect(host, port, user, password string) (*stomp.Conn, error) {
-	var options error = []func(*stomp.Conn) error{
+	var options []func(*stomp.Conn) error = []func(*stomp.Conn) error{
 		stomp.ConnOpt.HeartBeat(0, 0),
 	}
 	conn, err := stomp.Dial("tcp", net.JoinHostPort(host, port), options...)
