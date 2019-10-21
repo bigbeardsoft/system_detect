@@ -7,9 +7,7 @@ import (
 	tools "system_detect/tools"
 )
 
-/**
-* 获取系统内存,CPU和进程数量信息.
- */
+//SysUsedInfo 获取系统内存,CPU和进程数量信息.
 type SysUsedInfo struct {
 	CPUFree      float64
 	MemFree      uint64
@@ -21,20 +19,10 @@ type SysUsedInfo struct {
 
 //GetSystemUsedInfo 获取系统的进程数量,CPU使用率,内存大小和空闲内存.
 func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
-
-	// cmd := exec.Command("top", "-bn 1")
-
-	// var out bytes.Buffer
-	// cmd.Stdout = &out
-	// err := cmd.Run()
-
-	// if err != nil {
-	// 	fmt.Printf(" Execute command [%s] happen an  error :%v\n", "top -bn 1", err)
-	// 	return nil, err
-	// }
-
 	cmdresult, err := tools.ExecuteCommand("top -bn 1")
-
+	if nil != err {
+		return nil, err
+	}
 	var lines [5]string
 	resultstr := strings.Split(cmdresult, "\n")
 	var index int

@@ -17,15 +17,15 @@ func main() {
 	msg2 := service.CreateRegisterMsg("A10103")
 	println(msg2)
 	service.DispatherMsg(msg2)
-	var p process.Process
-	proc, erro := p.GetAllProcess()
-	if nil != erro {
-		println(erro)
-	}
-	println("=1==========")
-	for _, r := range proc {
-		fmt.Printf("%v\n", r)
-	}
+	// var p process.Process
+	// proc, erro := p.GetAllProcess()
+	// if nil != erro {
+	// 	println(erro)
+	// }
+	// println("=1==========")
+	// for _, r := range proc {
+	// 	fmt.Printf("%v\n", r)
+	// }
 	println("=2==========")
 	x := new(system.SysUsedInfo)
 	pd, er := x.GetSystemUsedInfo()
