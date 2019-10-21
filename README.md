@@ -1,4 +1,4 @@
-# system_detect
+# go-mycode
 go code
 ## 系统功能
   本代码采用go语言编写  
