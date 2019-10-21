@@ -69,7 +69,7 @@ func ExecuteCommand(cmdString string) (string, error) {
 	cmd := exec.Command(cmdwithpath, "-c", cmdString)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("执行命令:%s,发生错误,错误信息:%v", cmdString, err)
 	}
 
 	s := string(out)

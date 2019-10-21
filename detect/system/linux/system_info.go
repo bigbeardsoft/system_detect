@@ -1,9 +1,7 @@
 package system
 
 import (
-	"bytes"
 	"fmt"
-	"os/exec"
 	"strconv"
 	"strings"
 	tools "system_detect/tools"
@@ -26,30 +24,42 @@ type SysUsedInfo struct {
  */
 func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 
-	cmd := exec.Command("top", "-bn 1")
+	// cmd := exec.Command("top", "-bn 1")
 
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
+	// var out bytes.Buffer
+	// cmd.Stdout = &out
+	// err := cmd.Run()
 
-	if err != nil {
-		fmt.Printf(" Execute command  happen an  error :%v\n", err)
-		return nil, err
-	}
+	// if err != nil {
+	// 	fmt.Printf(" Execute command [%s] happen an  error :%v\n", "top -bn 1", err)
+	// 	return nil, err
+	// }
+
+	cmdresult, err := tools.ExecuteCommand("top -bn 1")
+
+	// var lines [5]string
+	// for i := 0; i < len(lines); i++ {
+	// 	line, err := out.ReadString('\n')
+	// 	if err != nil {
+	// 		break
+	// 	} else {
+	// 		line = strings.Trim(line, " \\r\\t\\n\\v\\f")
+	// 		if "" != line && len(line) > 0 {
+	// 			lines[i] = line
+	// 		}
+	// 	}
+	// }
 
 	var lines [5]string
-	for i := 0; i < len(lines); i++ {
-		line, err := out.ReadString('\n')
-		if err != nil {
-			break
-		} else {
-			line = strings.Trim(line, " \\r\\t\\n\\v\\f")
-			if "" != line && len(line) > 0 {
-				lines[i] = line
-			}
+	strs := strings.Split(cmdresult, "\n")
+	var index int
+	for _, r := range strs {
+		r = strings.Trim(r, " \\r\\t\\n\\v\\f")
+		if "" != r && len(r) > 0 {
+			lines[index] = r
+			index++
 		}
 	}
-
 	var r SysUsedInfo
 
 	processTokens := strings.Split(lines[1], " ")

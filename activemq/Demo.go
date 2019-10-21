@@ -49,7 +49,7 @@ func send(msg, queueName string, conn *stomp.Conn) {
 	activeMqProducer(msg, queueName, conn)
 }
 
-func doAcitveMQDemo() *stomp.Conn {
+func doActiveMQDemo() *stomp.Conn {
 
 	host := "127.0.0.1"
 	port := "61613"
