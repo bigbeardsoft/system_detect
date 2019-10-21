@@ -41,7 +41,7 @@ go code
             [  
                 {  
                     "Path":"/",  
-                    "TotoalSpace":"1024GB",  
+                    "TotalSpace":"1024GB",  
                     "FreeSpace":"240GB"  
                 }  
             ],  
@@ -91,7 +91,7 @@ go code
 |NetWork|当前服务器网络使用率|是||
 |DiskFreeSpace|硬盘空间|是|对象数组|
 |Path|硬盘路径|是||
-|TotolSpace|总空间|是||
+|TotalSpace|总空间|是||
 |FreeSpace|剩余空间|是||
 |ProcessInfo|进程信息|是|对象数组|
 |PID|进程PID|是||
