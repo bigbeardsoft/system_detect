@@ -19,9 +19,7 @@ type SysUsedInfo struct {
 	ProcessCount int
 }
 
-/**
-*获取系统的进程数量,CPU使用率,内存大小和空闲内存.
- */
+//GetSystemUsedInfo 获取系统的进程数量,CPU使用率,内存大小和空闲内存.
 func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 
 	// cmd := exec.Command("top", "-bn 1")
@@ -37,23 +35,10 @@ func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 
 	cmdresult, err := tools.ExecuteCommand("top -bn 1")
 
-	// var lines [5]string
-	// for i := 0; i < len(lines); i++ {
-	// 	line, err := out.ReadString('\n')
-	// 	if err != nil {
-	// 		break
-	// 	} else {
-	// 		line = strings.Trim(line, " \\r\\t\\n\\v\\f")
-	// 		if "" != line && len(line) > 0 {
-	// 			lines[i] = line
-	// 		}
-	// 	}
-	// }
-
 	var lines [5]string
-	strs := strings.Split(cmdresult, "\n")
+	resultstr := strings.Split(cmdresult, "\n")
 	var index int
-	for _, r := range strs {
+	for _, r := range resultstr {
 		r = strings.Trim(r, " \\r\\t\\n\\v\\f")
 		if "" != r && len(r) > 0 {
 			lines[index] = r
