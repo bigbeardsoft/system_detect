@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+
+	"github.com/fwhezfwhez/errorx"
 )
 
 // IsNumeric 判断字符串是否为数字
@@ -63,13 +65,13 @@ func ExecuteCommand(cmdString string) (string, error) {
 	cmdwithpath, err := exec.LookPath("bash")
 	if err != nil {
 		fmt.Println("not find bash.")
-		return "", err
+		return "", errorx.New(err)
 	}
 
 	cmd := exec.Command(cmdwithpath, "-c", cmdString)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", fmt.Errorf("执行命令:%s,发生错误,错误信息:%v", cmdString, err)
+		return "", errorx.New(fmt.Errorf("执行命令:%s,发生错误,错误信息:%v", cmdString, err))
 	}
 
 	s := string(out)

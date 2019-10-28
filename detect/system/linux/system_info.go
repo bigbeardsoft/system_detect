@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 	tools "system_detect/tools"
+
+	"github.com/fwhezfwhez/errorx"
 )
 
 //SysUsedInfo 获取系统内存,CPU和进程数量信息.
@@ -21,7 +23,7 @@ type SysUsedInfo struct {
 func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 	cmdresult, err := tools.ExecuteCommand("top -bn 1")
 	if nil != err {
-		return nil, err
+		return nil, errorx.Wrap(err)
 	}
 	var lines [5]string
 	resultstr := strings.Split(cmdresult, "\n")
@@ -33,7 +35,7 @@ func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 			index++
 		}
 	}
-	var r SysUsedInfo
+	var r = new(SysUsedInfo)
 
 	processTokens := strings.Split(lines[1], " ")
 	count, err := strconv.Atoi(processTokens[1])
@@ -113,5 +115,5 @@ func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 		fmt.Println(lines[3])
 	}
 
-	return &r, nil
+	return r, nil
 }

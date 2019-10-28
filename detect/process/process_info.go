@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	tools "system_detect/tools"
+
+	"github.com/fwhezfwhez/errorx"
 )
 
 //Process 获取系统的进程信息
@@ -69,7 +71,8 @@ func (p *Process) GetAllProcess() ([]Process, error) {
 			fmt.Printf("%v\n", err)
 		}
 
-		processes = append(processes, Process{User: user, Pid: pid, CPU: cpu, Memory: mem, StartTime: startTime, ProcessPath: cmd, ThreadCount: threadCount})
+		processes = append(processes, Process{User: user, Pid: pid,
+			CPU: cpu, Memory: mem, StartTime: startTime, ProcessPath: cmd, ThreadCount: threadCount})
 	}
 	for index := 0; index < len(processes); index++ {
 		for j := index; j < len(processes); j++ {
@@ -89,7 +92,7 @@ func GetProcessThreadCount(pid int) (int, error) {
 	cmd := fmt.Sprintf("ps -T -p %s", strconv.Itoa(pid))
 	result, err := tools.ExecuteCommand(cmd)
 	if nil != err {
-		return -1, err
+		return -1, errorx.Wrap(err)
 	}
 
 	threadStrings := strings.Split(result, "\n")

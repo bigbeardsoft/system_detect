@@ -6,6 +6,7 @@ import (
 	"system_detect/detect/process"
 	system "system_detect/detect/system/linux"
 	"system_detect/service"
+	"time"
 )
 
 /**
@@ -13,6 +14,16 @@ import (
 	第一步启动一个线程,定时采集,时间间隔从配置文件中获取.
 **/
 func main() {
+	service.StartDetect()
+	service.StopDetect()
+	return
+	println(time.Now().String())
+	d := time.Now()
+	sd := fmt.Sprintf("%d-%02d-%02d %0d:%02d:%02d ", d.Year(), d.Month(), d.Day(), d.Hour(), d.Minute(), d.Second())
+	println(sd)
+	println(fmt.Sprintf("%03d", 02))
+
+	return
 
 	msg2 := service.CreateRegisterMsg("A10103")
 	println(msg2)

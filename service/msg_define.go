@@ -35,8 +35,8 @@ type MsgRegBody struct {
 // DiskSpaceInfo 磁盘空间消息
 type DiskSpaceInfo struct {
 	Path       string
-	TotalSpace int
-	FreeSpace  int
+	TotalSpace uint64
+	FreeSpace  uint64
 }
 
 //ProcessInfo 进程信息消息
@@ -59,7 +59,7 @@ type MsgServerInfoBody struct {
 	CollectTime   string
 	ProcessCount  int
 	CPU           float64
-	MEM           float64
+	MEM           uint64
 	ThreadCount   int
 	HanderCount   int
 	NetWork       int

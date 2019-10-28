@@ -27,6 +27,7 @@ func DispatherMsg(jsonstr string) error {
 	}
 	return nil
 }
+
 func checkHead(head map[string]interface{}) (bool, error) {
 	returnResult := head["R"]
 	if returnResult == false {
