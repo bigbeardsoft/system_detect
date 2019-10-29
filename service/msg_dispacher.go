@@ -22,8 +22,10 @@ func DispatherMsg(jsonstr string) error {
 	if code == FRegCode {
 		fmt.Printf("%v\n", tmp)
 		//调用处理函数,存储token等信息
+
 	} else if code == FServerStatReport {
 		fmt.Printf("%v\n", tmp)
+
 	}
 	return nil
 }
