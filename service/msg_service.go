@@ -9,24 +9,32 @@ import (
 	"github.com/fwhezfwhez/errorx"
 )
 
-var isRun bool
+// DetectCallback 回调
+type DetectCallback interface {
+	Notify(string)
+}
 
-var mutex sync.Mutex
+// Service 系统检测
+type Service struct {
+	isRun    bool
+	mutex    sync.Mutex
+	Callback DetectCallback
+}
 
 // StartDetect 启动监测
-func StartDetect() {
-	mutex.Lock()
-	if isRun {
+func (servicePoint *Service) StartDetect() {
+	servicePoint.mutex.Lock()
+	if servicePoint.isRun {
 		fmt.Println("服务正在运行....")
 		return
 	}
-	isRun = true
-	mutex.Unlock()
+	servicePoint.isRun = true
+	servicePoint.mutex.Unlock()
 	var sysUsed = new(system.SysUsedInfo)
 	var diskStatus system.DiskStatus
 	var paths []string
 	var prc = new(process.Process)
-	for isRun {
+	for servicePoint.isRun {
 		s, err := sysUsed.GetSystemUsedInfo()
 		if nil != err {
 			fmt.Printf("========>%v\n<=======", err.(errorx.Error).PrintStackTrace())
@@ -50,10 +58,11 @@ func StartDetect() {
 
 		result := CreateDetectMsg(pcc, s, xpath)
 		println(result)
+		go servicePoint.Callback.Notify(result)
 	}
 }
 
 // StopDetect 停止监测
-func StopDetect() {
-	isRun = false
+func (servicePoint *Service) StopDetect() {
+	servicePoint.isRun = false
 }
