@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/spf13/viper"
+
 	"github.com/fwhezfwhez/errorx"
 )
 
@@ -83,4 +85,22 @@ func ConvertToJSON(v interface{}) (string, error) {
 	b, err := json.Marshal(v)
 	jsonStr := string(b)
 	return jsonStr, err
+}
+
+// ReadConfigFile 读配置文件
+func ReadConfigFile(path string) (map[string]interface{}, error) {
+	viper.SetConfigFile(path)
+	err := viper.ReadInConfig()
+	if nil != err {
+		return nil, errorx.New(err)
+	}
+	allkey := viper.AllKeys()
+	fmt.Printf("%v\n", allkey)
+
+	allmap:=make(map[string]interface{},16)
+
+	for _,key := range allkey {
+		allmap[key]=viper.Get(key)
+	}
+	return allmap, nil
 }
