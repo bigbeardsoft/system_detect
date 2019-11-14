@@ -15,7 +15,7 @@ func test() {
 
 func testDiskInfo() {
 	var x linux.DiskStatus
-	p := x.DiskUsage("/home")
+	p, _ := x.DiskUsage("/home")
 	fmt.Printf("all:%dKB,free:%dKB,used:%dKB\n", p.All, p.Free, p.Used)
 }
 
