@@ -1,10 +1,23 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"system_detect/detect/process"
+	"os"
+	"strconv"
+	"system_detect/service"
 	"system_detect/tools"
 )
+
+type appConfig struct {
+	mqIP                string
+	mqPort              int
+	mqUser              string
+	mqPwd               string
+	mqQueueName         string
+	mqSendQueueName     string
+	collectTimeInterval int
+}
 
 /**
 说明:
@@ -12,8 +25,52 @@ import (
 **/
 func main() {
 
-	m, _ := tools.ReadConfigFile("/Users/shibin/work/greatech/code/work_code/emgc-greatech/configer-server/src/main/resources/config/gateway-dev.yml")
-	fmt.Printf("%v\n", m)
+	cmds := "please in put command:\n1\tstart \n2\tstop\n"
+	println(cmds)
+	inputReader := bufio.NewReader(os.Stdin)
+	b, _, _ := inputReader.ReadLine()
+	cmd := string(b)
+	s := new(service.CollectService)
+	c := readConfig()
+	mq := new(service.MQService)
+	service.Init()
+
+	for cmd != "quit" {
+		if cmd == "start" {
+			mq.Init(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.mqQueueName)
+			s.Notify = func(json string) {
+				mq.SendMsg(c.mqSendQueueName, json)
+			}
+			s.StartDetect()
+		} else if cmd == "stop" {
+			s.StopDetect()
+		} else {
+			fmt.Printf("未知命令:%s\n", cmd)
+		}
+		println(cmds)
+		b, _, _ = inputReader.ReadLine()
+		cmd = string(b)
+	}
+}
+
+func readConfig() *appConfig {
+	configInfo, err := tools.ReadConfigFile("./config.yml")
+	c := new(appConfig)
+	if nil != err {
+		return nil
+	}
+	c.mqIP = configInfo["mq.ip"].(string)
+	c.mqPort = configInfo["mq.port"].(int)
+	c.mqUser = configInfo["mq.user"].(string)
+	c.mqPwd = configInfo["mq.pwd"].(string)
+	c.mqQueueName = configInfo["mq.queues"].(string)
+	c.mqSendQueueName = configInfo["mq.sendqueue"].(string)
+	c.collectTimeInterval = configInfo["collect.interval"].(int)
+	return c
+}
+
+func testA() {
+
 	// var m map[string]interface{}
 	// m = make(map[string]interface{}, 16)
 	// m["a"] = 1
@@ -51,21 +108,4 @@ func main() {
 	// }
 	// fmt.Printf("%v\n", pd)
 	// activemq.CallActiveMq()
-}
-
-func readConfig() {
-
-}
-
-func startDetect(f func(json string)) {
-
-	var p process.Process
-	result, err := p.GetAllProcess()
-	if nil != err {
-		fmt.Printf("获取进程信息发生错误:%v\n", err)
-	} else {
-		for _, r := range result {
-			fmt.Printf("%v\n", r)
-		}
-	}
 }

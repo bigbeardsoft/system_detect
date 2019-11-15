@@ -13,10 +13,10 @@ type DealReg struct {
 //DealServerStatReport 处理状态码
 type DealServerStatReport struct{}
 
-func (d *DealReg) Deal(map[string]interface{}) {
+func (d *DealReg) Deal(map[string]interface{},func ()) {
 
 }
 
-func (d *DealServerStatReport) Deal(map[string]interface{}) {
+func (d *DealServerStatReport) Deal(map[string]interface{},func ()) {
 
 }

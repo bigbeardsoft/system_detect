@@ -10,13 +10,11 @@ var methods map[string]deal.DealResponse
 
 // Init 初始化
 func Init() {
-
 	methods = make(map[string]deal.DealResponse, 2)
 	dreg := new(deal.DealReg)
 	methods[FRegCode] = dreg
 	dstat := new(deal.DealServerStatReport)
 	methods[FServerStatReport] = dstat
-
 }
 
 // DispatherMsg 解析消息并完成消息调度
@@ -34,7 +32,7 @@ func DispatherMsg(jsonstr string) error {
 	}
 	code := headMap["F"].(string)
 	if f, ok := methods[code]; ok {
-		f.Deal(tmp)
+		f.Deal(tmp,nil)
 	} else {
 		fmt.Printf("未实现[%s]协议的处理,json内容:%s", code, jsonstr)
 	}

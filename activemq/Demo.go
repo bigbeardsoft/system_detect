@@ -100,6 +100,7 @@ func CallActiveMq() {
 func connectToServerB(host, port, user, pwd string, queues []string) {
 	var a *MsgQueue
 	var b MsgQueue
+
 	a = &b
 	a.Host = "aaaa"
 	a.Port = "12312"

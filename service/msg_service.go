@@ -9,20 +9,15 @@ import (
 	"github.com/fwhezfwhez/errorx"
 )
 
-// DetectCallback 回调
-type DetectCallback interface {
-	Notify(string)
-}
-
-// Service 系统检测
-type Service struct {
-	isRun    bool
-	mutex    sync.Mutex
-	Callback DetectCallback
+// CollectService 系统检测
+type CollectService struct {
+	isRun  bool
+	mutex  sync.Mutex
+	Notify func(string)
 }
 
 // StartDetect 启动监测
-func (servicePoint *Service) StartDetect() {
+func (servicePoint *CollectService) StartDetect() {
 	servicePoint.mutex.Lock()
 	if servicePoint.isRun {
 		fmt.Println("服务正在运行....")
@@ -58,11 +53,11 @@ func (servicePoint *Service) StartDetect() {
 
 		result := CreateDetectMsg(pcc, s, xpath)
 		println(result)
-		go servicePoint.Callback.Notify(result)
+		go servicePoint.Notify(result)
 	}
 }
 
 // StopDetect 停止监测
-func (servicePoint *Service) StopDetect() {
+func (servicePoint *CollectService) StopDetect() {
 	servicePoint.isRun = false
 }

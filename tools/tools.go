@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	"runtime/debug"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -73,6 +74,7 @@ func ExecuteCommand(cmdString string) (string, error) {
 	cmd := exec.Command(cmdwithpath, "-c", cmdString)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
+		debug.PrintStack()
 		return "", errorx.New(fmt.Errorf("执行命令:%s,发生错误,错误信息:%v", cmdString, err))
 	}
 
@@ -97,10 +99,10 @@ func ReadConfigFile(path string) (map[string]interface{}, error) {
 	allkey := viper.AllKeys()
 	fmt.Printf("%v\n", allkey)
 
-	allmap:=make(map[string]interface{},16)
+	allmap := make(map[string]interface{}, len(allkey))
 
-	for _,key := range allkey {
-		allmap[key]=viper.Get(key)
+	for _, key := range allkey {
+		allmap[key] = viper.Get(key)
 	}
 	return allmap, nil
 }

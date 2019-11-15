@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/fwhezfwhez/errorx"
+
 	"github.com/go-stomp/stomp"
 )
 
@@ -21,7 +23,7 @@ type MsgQueue struct {
 // Connect 连接到消息服务器,使用tcp的方式连接
 // host:主机地址
 // port:连接端口
-func (msgQueue *MsgQueue) Connect(host, port, user, password string) (*stomp.Conn, error) {
+func (msgQueue *MsgQueue) connect(host, port, user, password string) (*stomp.Conn, error) {
 	var options []func(*stomp.Conn) error = []func(*stomp.Conn) error{
 		stomp.ConnOpt.HeartBeat(0, 0),
 	}
@@ -30,7 +32,8 @@ func (msgQueue *MsgQueue) Connect(host, port, user, password string) (*stomp.Con
 	msgQueue.Port = port
 	msgQueue.password = password
 	msgQueue.user = user
-	return conn, err
+
+	return conn, errorx.New(err)
 }
 
 //SubscriptQueue 订阅消息
@@ -44,7 +47,7 @@ func (msgQueue *MsgQueue) SubscriptQueue(queueName string, conn *stomp.Conn) (*s
 		return nil, fmt.Errorf("server is not connected")
 	}
 	sub, err := conn.Subscribe(queueName, stomp.AckMode(stomp.AckAuto))
-	return sub, err
+	return sub, errorx.New(err)
 }
 
 //UnSubscriptQueue 取消订阅
@@ -82,7 +85,7 @@ func (msgQueue *MsgQueue) Send(queueName, msg string, conn *stomp.Conn) error {
 //   error:错误信息
 func (msgQueue *MsgQueue) Receive(sub *stomp.Subscription, callback func(msg, queueName string)) error {
 	if nil == sub {
-		return fmt.Errorf("subscription is nil")
+		return errorx.New(fmt.Errorf("subscription is nil"))
 	}
 	fmt.Printf(" ready to receive from [%s]\r\n", sub.Destination())
 
@@ -109,9 +112,9 @@ func (msgQueue *MsgQueue) Receive(sub *stomp.Subscription, callback func(msg, qu
 //	callback:接收到消息的回调函数
 func (msgQueue *MsgQueue) ConnectToServer(host, port, user, pwd string, queues []string, callback func(msg, queueName string)) error {
 
-	conn, err := msgQueue.Connect(host, port, user, pwd)
+	conn, err := msgQueue.connect(host, port, user, pwd)
 	if err != nil {
-		return err
+		return errorx.New(err)
 	}
 	if msgQueue == nil {
 		println("msgqueue is nil")
@@ -125,7 +128,7 @@ func (msgQueue *MsgQueue) ConnectToServer(host, port, user, pwd string, queues [
 			go msgQueue.Receive(sub, callback)
 		} else {
 			msgQueue.Disconnect()
-			return err
+			return errorx.New(err)
 		}
 	}
 	return nil
