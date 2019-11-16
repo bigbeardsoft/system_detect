@@ -1,9 +1,9 @@
 package main
 
 import (
-	"bufio"
+	// "bufio"
 	"fmt"
-	"os"
+	// "os"
 	"strconv"
 	"system_detect/service"
 	"system_detect/tools"
@@ -27,36 +27,37 @@ func main() {
 
 	ShowCmdInfo := "please in put command:\n1\tstart \n2\tstop\n"
 	println(ShowCmdInfo)
-	inputReader := bufio.NewReader(os.Stdin)
-	b, _, _ := inputReader.ReadLine()
-	cmd := string(b)
+	// inputReader := bufio.NewReader(os.Stdin)
+	// b, _, _ := inputReader.ReadLine()
+	// cmd := string(b)
 	s := new(service.CollectService)
 	c := readConfig()
 	mq := new(service.MQService)
 	service.Init()
 
-	for cmd != "quit" {
-		if cmd == "start" {
+	// for cmd != "quit" {
+	// 	if cmd == "start" {
 			mq.Init(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.mqQueueName)
 			s.Notify = func(json string) {
 				mq.SendMsg(c.mqSendQueueName, json)
 			}
 			s.StartDetect()
-		} else if cmd == "stop" {
-			s.StopDetect()
-		} else {
-			fmt.Printf("未知命令:%s\n", cmd)
-		}
-		println(ShowCmdInfo)
-		b, _, _ = inputReader.ReadLine()
-		cmd = string(b)
-	}
+	// 	} else if cmd == "stop" {
+	// 		s.StopDetect()
+	// 	} else {
+	// 		fmt.Printf("未知命令:%s\n", cmd)
+	// 	}
+	// 	println(ShowCmdInfo)
+	// 	b, _, _ = inputReader.ReadLine()
+	// 	cmd = string(b)
+	// }
 }
 
 func readConfig() *appConfig {
 	configInfo, err := tools.ReadConfigFile("./config.yml")
 	c := new(appConfig)
 	if nil != err {
+		fmt.Printf("读配置文件错误,错误信息:%v",err)
 		return nil
 	}
 	c.mqIP = configInfo["mq.ip"].(string)
