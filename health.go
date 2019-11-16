@@ -25,8 +25,8 @@ type appConfig struct {
 **/
 func main() {
 
-	cmds := "please in put command:\n1\tstart \n2\tstop\n"
-	println(cmds)
+	ShowCmdInfo := "please in put command:\n1\tstart \n2\tstop\n"
+	println(ShowCmdInfo)
 	inputReader := bufio.NewReader(os.Stdin)
 	b, _, _ := inputReader.ReadLine()
 	cmd := string(b)
@@ -47,7 +47,7 @@ func main() {
 		} else {
 			fmt.Printf("未知命令:%s\n", cmd)
 		}
-		println(cmds)
+		println(ShowCmdInfo)
 		b, _, _ = inputReader.ReadLine()
 		cmd = string(b)
 	}
