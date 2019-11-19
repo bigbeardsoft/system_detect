@@ -31,7 +31,7 @@ func (p *Process) GetAllProcess() ([]Process, error) {
 	cmd.Stdout = &out
 	err := cmd.Run()
 	if err != nil {
-		log.Fatal(err)
+		//	log.Fatal(err)
 		fmt.Printf("%v\n", err)
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (p *Process) GetAllProcess() ([]Process, error) {
 		}
 		threadCount, err := GetProcessThreadCount(pid)
 		if nil != err {
-			fmt.Printf("%v\n", err)
+			fmt.Printf("获取进程[%v]的线程信息发生错误%v\n", ft, err)
 		}
 
 		processes = append(processes, Process{User: user, Pid: pid,
@@ -89,6 +89,9 @@ func (p *Process) GetAllProcess() ([]Process, error) {
 // GetProcessThreadCount 获取指定进程的线程数量
 func GetProcessThreadCount(pid int) (int, error) {
 
+	if ok := checkProcessExits(pid); ok == false {
+		return -1, errorx.New(fmt.Errorf("进程[%d]不存在", pid))
+	}
 	cmd := fmt.Sprintf("ps -T -p %s", strconv.Itoa(pid))
 	result, err := tools.ExecuteCommand(cmd)
 	if nil != err {
@@ -98,4 +101,15 @@ func GetProcessThreadCount(pid int) (int, error) {
 	threadStrings := strings.Split(result, "\n")
 	threadCount := len(threadStrings) - 1
 	return threadCount, nil
+}
+
+func checkProcessExits(pid int) bool {
+
+	cmd := fmt.Sprintf("ps -ef|grep %s", strconv.Itoa(pid))
+	result, err := tools.ExecuteCommand(cmd)
+	if nil == err {
+		countStr := strings.Split(result, "\n")
+		return len(countStr) > 1
+	}
+	return false
 }

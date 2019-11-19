@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"net"
+	"strings"
 	"sync"
 	system "system_detect/detect/system/linux"
 	tools "system_detect/tools"
@@ -75,7 +76,7 @@ func CreateDetectMsg(process []ProcessInfo, sys *system.SysUsedInfo, diskinfo []
 		fmt.Printf("%v\n", err)
 		return ""
 	}
-	return json
+	return strings.ReplaceAll(json, "\n", "")
 }
 
 func getLocalIPAddress() []string {

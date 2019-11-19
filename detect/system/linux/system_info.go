@@ -34,7 +34,11 @@ func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 			lines[index] = r
 			index++
 		}
+		if index == len(lines) {
+			break
+		}
 	}
+
 	var r = new(SysUsedInfo)
 
 	processTokens := strings.Split(lines[1], " ")

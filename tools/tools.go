@@ -4,12 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
-	"runtime/debug"
 	"strings"
 
-	"github.com/spf13/viper"
-
 	"github.com/fwhezfwhez/errorx"
+	"github.com/spf13/viper"
 )
 
 // IsNumeric 判断字符串是否为数字
@@ -74,10 +72,8 @@ func ExecuteCommand(cmdString string) (string, error) {
 	cmd := exec.Command(cmdwithpath, "-c", cmdString)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		debug.PrintStack()
 		return "", errorx.New(fmt.Errorf("执行命令:%s,发生错误,错误信息:%v", cmdString, err))
 	}
-
 	s := string(out)
 	return s, nil
 }

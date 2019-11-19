@@ -6,7 +6,6 @@ import (
 	"net"
 
 	"github.com/fwhezfwhez/errorx"
-
 	"github.com/go-stomp/stomp"
 )
 
@@ -28,12 +27,16 @@ func (msgQueue *MsgQueue) connect(host, port, user, password string) (*stomp.Con
 		stomp.ConnOpt.HeartBeat(0, 0),
 	}
 	conn, err := stomp.Dial("tcp", net.JoinHostPort(host, port), options...)
-	msgQueue.Host = host
-	msgQueue.Port = port
-	msgQueue.password = password
-	msgQueue.user = user
-
-	return conn, errorx.New(err)
+	if nil == err {
+		msgQueue.Host = host
+		msgQueue.Port = port
+		msgQueue.password = password
+		msgQueue.user = user
+		return conn, nil
+	} else {
+		fmt.Printf("连接到[%s:%s %s,%s]失败,错误信息:%v\n", host, port, user, password, err)
+		return nil, errorx.New(err)
+	}
 }
 
 //SubscriptQueue 订阅消息

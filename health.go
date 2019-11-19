@@ -1,9 +1,10 @@
 package main
 
 import (
-	// "bufio"
+	"bufio"
 	"fmt"
-	// "os"
+	"log"
+	"os"
 	"strconv"
 	"system_detect/service"
 	"system_detect/tools"
@@ -25,39 +26,44 @@ type appConfig struct {
 **/
 func main() {
 
-	ShowCmdInfo := "please in put command:\n1\tstart \n2\tstop\n"
+	ShowCmdInfo := "please in put command:\nstart:开启服务 \n stop:停止服务\n"
 	println(ShowCmdInfo)
-	// inputReader := bufio.NewReader(os.Stdin)
-	// b, _, _ := inputReader.ReadLine()
-	// cmd := string(b)
+	inputReader := bufio.NewReader(os.Stdin)
+	b, _, _ := inputReader.ReadLine()
+	cmd := string(b)
 	s := new(service.CollectService)
 	c := readConfig()
 	mq := new(service.MQService)
 	service.Init()
 
-	// for cmd != "quit" {
-	// 	if cmd == "start" {
-			mq.Init(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.mqQueueName)
-			s.Notify = func(json string) {
-				mq.SendMsg(c.mqSendQueueName, json)
+	for cmd != "quit" {
+		if cmd == "start" {
+			err := mq.Init(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.mqQueueName)
+			if nil != err {
+				log.Fatal(fmt.Printf("初始化mq发生异常,异常信息:\n%v", err))
+			} else {
+				log.Printf("连接到mq服务器[%s:%d]成功\n", c.mqIP, c.mqPort)
+				s.Notify = func(json string) {
+					mq.SendMsg(c.mqSendQueueName, json)
+				}
+				s.StartDetect()
 			}
-			s.StartDetect()
-	// 	} else if cmd == "stop" {
-	// 		s.StopDetect()
-	// 	} else {
-	// 		fmt.Printf("未知命令:%s\n", cmd)
-	// 	}
-	// 	println(ShowCmdInfo)
-	// 	b, _, _ = inputReader.ReadLine()
-	// 	cmd = string(b)
-	// }
+		} else if cmd == "stop" {
+			s.StopDetect()
+		} else {
+			fmt.Printf("未知命令:%s\n", cmd)
+		}
+		println(ShowCmdInfo)
+		b, _, _ = inputReader.ReadLine()
+		cmd = string(b)
+	}
 }
 
 func readConfig() *appConfig {
 	configInfo, err := tools.ReadConfigFile("./config.yml")
 	c := new(appConfig)
 	if nil != err {
-		fmt.Printf("读配置文件错误,错误信息:%v",err)
+		fmt.Printf("读配置文件错误,错误信息:%v", err)
 		return nil
 	}
 	c.mqIP = configInfo["mq.ip"].(string)
@@ -68,45 +74,4 @@ func readConfig() *appConfig {
 	c.mqSendQueueName = configInfo["mq.sendqueue"].(string)
 	c.collectTimeInterval = configInfo["collect.interval"].(int)
 	return c
-}
-
-func testA() {
-
-	// var m map[string]interface{}
-	// m = make(map[string]interface{}, 16)
-	// m["a"] = 1
-	// m["b"] = "asdfas"
-	// fmt.Printf("%v\n", m)
-	// return
-	// service.StartDetect()
-	// service.StopDetect()
-	// return
-	// println(time.Now().String())
-	// d := time.Now()
-	// sd := fmt.Sprintf("%d-%02d-%02d %0d:%02d:%02d ", d.Year(), d.Month(), d.Day(), d.Hour(), d.Minute(), d.Second())
-	// println(sd)
-	// println(fmt.Sprintf("%03d", 02))
-
-	// return
-
-	// msg2 := service.CreateRegisterMsg("A10103")
-	// println(msg2)
-	// service.DispatherMsg(msg2)
-	// var p process.Process
-	// proc, erro := p.GetAllProcess()
-	// if nil != erro {
-	// 	println(erro)
-	// }
-	// println("=1==========")
-	// for _, r := range proc {
-	// 	fmt.Printf("%v\n", r)
-	// }
-	// println("=2==========")
-	// x := new(system.SysUsedInfo)
-	// pd, er := x.GetSystemUsedInfo()
-	// if nil != er {
-	// 	fmt.Printf("%v\n", er)
-	// }
-	// fmt.Printf("%v\n", pd)
-	// activemq.CallActiveMq()
 }

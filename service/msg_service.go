@@ -52,7 +52,7 @@ func (servicePoint *CollectService) StartDetect() {
 		}
 
 		result := CreateDetectMsg(pcc, s, xpath)
-		println(result)
+		//println(result)
 		go servicePoint.Notify(result)
 	}
 }
