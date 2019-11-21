@@ -1,13 +1,11 @@
 package service
 
 import (
-	"fmt"
 	"sync"
 	"system_detect/detect/process"
 	system "system_detect/detect/system/linux"
+	"system_detect/tools"
 	"time"
-
-	"github.com/fwhezfwhez/errorx"
 )
 
 // CollectService 系统检测
@@ -18,13 +16,13 @@ type CollectService struct {
 	TimeInterval int
 }
 
-var wg sync.WaitGroup
+var logger tools.Logger
 
 // StartDetect 启动监测
 func (servicePoint *CollectService) StartDetect() {
 	servicePoint.mutex.Lock()
 	if servicePoint.isRun {
-		fmt.Println("服务正在运行....")
+		logger.Debugf("服务正在运行....")
 		return
 	}
 	servicePoint.isRun = true
@@ -35,11 +33,11 @@ func (servicePoint *CollectService) StartDetect() {
 	var paths []string
 	var prc = new(process.Process)
 	systenName := system.GetSystemName()
-	ip := system.GetLocalIp()
+	ip := system.GetLocalIP()
 	for servicePoint.isRun {
 		s, err := sysUsed.GetSystemUsedInfo()
 		if nil != err {
-			fmt.Printf("========>%v\n<=======", err.(errorx.Error).PrintStackTrace())
+			logger.Errorf("读取系统使用信息发生错误:%v", err)
 			return
 		}
 		var xpath []DiskSpaceInfo

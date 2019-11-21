@@ -12,6 +12,8 @@ import (
 	"github.com/fwhezfwhez/errorx"
 )
 
+var logger tools.Logger
+
 //Process 获取系统的进程信息
 type Process struct {
 	ProcessName string
@@ -31,8 +33,7 @@ func (p *Process) GetAllProcess() ([]Process, error) {
 	cmd.Stdout = &out
 	err := cmd.Run()
 	if err != nil {
-		//	log.Fatal(err)
-		fmt.Printf("%v\n", err)
+		logger.Errorf("执行命令发生错误:%v", err)
 		return nil, err
 	}
 	processes := make([]Process, 0)
@@ -68,7 +69,7 @@ func (p *Process) GetAllProcess() ([]Process, error) {
 		}
 		threadCount, err := GetProcessThreadCount(pid)
 		if nil != err {
-			fmt.Printf("获取进程[%v]的线程信息发生错误%v\n", ft, err)
+			logger.Errorf("获取进程[%v]的线程信息发生错误%v\n", ft, err)
 		}
 
 		processes = append(processes, Process{User: user, Pid: pid,

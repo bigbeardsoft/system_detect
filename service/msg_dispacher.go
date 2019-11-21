@@ -53,7 +53,7 @@ func DispatherMsg(jsonstr string) error {
 	if f, ok := methods[code]; ok {
 		f.Deal(tmp)
 	} else {
-		fmt.Printf("未实现[%s]协议的处理,json内容:%s", code, jsonstr)
+		logger.Warringf("未实现[%s]协议的处理,json内容:%s", code, jsonstr)
 	}
 
 	return nil

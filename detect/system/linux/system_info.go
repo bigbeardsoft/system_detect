@@ -20,6 +20,8 @@ type SysUsedInfo struct {
 	ProcessCount int
 }
 
+var logger tools.Logger
+
 //GetSystemUsedInfo 获取系统的进程数量,CPU使用率,内存大小和空闲内存.
 func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 	cmdresult, err := tools.ExecuteCommand("top -bn 1")
@@ -47,8 +49,7 @@ func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 	if nil == err {
 		r.ProcessCount = count
 	} else {
-		fmt.Printf("Convert process count  happend an  error :%v\n", err)
-		fmt.Println(lines[1])
+		logger.Errorf("Convert process count  happend an  error :%v,错误数据:%s", err, lines[1])
 	}
 	cpuTokens := strings.Split(lines[2], " ")
 	var cpuInfo [5]string
@@ -69,8 +70,7 @@ func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 	if nil == err {
 		r.CPUFree = cpufree
 	} else {
-		fmt.Printf(" Convert CPU used precentage happend an  error :%v\n", err)
-		fmt.Println(lines[2])
+		logger.Errorf(" Convert CPU used precentage happend an  error :%v,错误数据:%s", err, lines[2])
 	}
 
 	memTokens := strings.Split(lines[3], " ")
@@ -102,22 +102,19 @@ func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 	if nil == err {
 		r.MemAll = memall
 	} else {
-		fmt.Printf(" Convert Mem All   (use index 0) happend an  error :%v\n", err)
-		fmt.Println(lines[3])
+		logger.Errorf(" Convert Mem All   (use index 0) happend an  error :%v,错误数据:%s", err, lines[3])
 	}
 	memfree, err := strconv.ParseUint(memInfo[1], 10, 64)
 	if nil == err {
 		r.MemFree = memfree
 	} else {
-		fmt.Printf(" Convert Mem free (use index 1) happend an  error :%v\n", err)
-		fmt.Println(lines[3])
+		logger.Errorf(" Convert Mem free (use index 1) happend an  error :%v,错误数据:%s", err, lines[3])
 	}
 	memcatch, err := strconv.ParseUint(memInfo[3], 10, 64)
 	if nil == err {
 		r.MemFree = r.MemFree + memcatch
 	} else {
-		fmt.Printf(" Convert Mem catch (use index 3) happend an  error :%v\n", err)
-		fmt.Println(lines[3])
+		logger.Errorf(" Convert Mem catch (use index 3) happend an  error :%v,错误数据:%s", err, lines[3])
 	}
 
 	return r, nil
@@ -128,17 +125,17 @@ func GetSystemName() string {
 	cmd := "uname -sn"
 	cmdresult, err := tools.ExecuteCommand(cmd)
 	if nil != err {
-		fmt.Printf("获取系统名称发生错误,执行[%s]命令错误", cmd)
+		logger.Errorf("获取系统名称发生错误,执行[%s]命令错误", cmd)
 		return ""
 	}
 	return cmdresult
 }
 
-// GetLocalIp 获取系统中的IP地址
-func GetLocalIp() string {
+// GetLocalIP 获取系统中的IP地址
+func GetLocalIP() string {
 	netInterfaces, err := net.Interfaces()
 	if err != nil {
-		fmt.Println("net.Interfaces failed, err:", err.Error())
+		logger.Errorf("net.Interfaces failed, err:", err.Error())
 		return ""
 	}
 	var ips = ""

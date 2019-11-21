@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"net"
 	"strings"
 	"sync"
 	system "system_detect/detect/system/linux"
@@ -75,35 +74,8 @@ func CreateDetectMsg(process []ProcessInfo, sys *system.SysUsedInfo, diskinfo []
 	msg.H = msghead
 	json, err := tools.ConvertToJSON(msg)
 	if nil != err {
-		fmt.Printf("%v\n", err)
+		logger.Errorf("json转化发生错误:%v", err)
 		return ""
 	}
 	return strings.ReplaceAll(json, "\n", "")
-}
-
-func getLocalIPAddress() []string {
-
-	var ret []string
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		fmt.Println(err)
-		return nil
-	}
-	for _, value := range addrs {
-		if ipnet, ok := value.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-			if ipnet.IP.To4() != nil {
-				fmt.Println(ipnet.IP.String())
-				ret = append(ret, ipnet.IP.String())
-			}
-		}
-	}
-	return ret
-}
-
-func getConvertRangeToString(val []string) string {
-	resultStr := ""
-	for _, r := range val {
-		resultStr += r + ","
-	}
-	return resultStr
 }

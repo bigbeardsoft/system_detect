@@ -9,4 +9,4 @@ mq:
 collect:
   interval: 5
 client:
-  client_key: abc
+  client_key: A3320000001

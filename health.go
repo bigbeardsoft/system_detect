@@ -2,12 +2,11 @@ package main
 
 import (
 	"bufio"
-	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"system_detect/service"
 	"system_detect/tools"
+	"time"
 )
 
 type appConfig struct {
@@ -21,6 +20,8 @@ type appConfig struct {
 	collectTimeInterval int
 	clientKey           string
 }
+
+var logger tools.Logger
 
 /**
 说明:
@@ -36,33 +37,49 @@ func main() {
 	c := readConfig()
 	mq := new(service.MQService)
 	service.Init()
-
+	mq.Callback = func(msg, queue string) {
+		logger.Debugf("收到:%v\n", msg)
+		service.DispatherMsg(msg)
+	}
+	registerResult := false
 	service.SetRegisterCallback(func(result bool) {
+		registerResult = result
 		if result {
-			fmt.Printf("签到成功,tooken:%s", service.GetToken())
+			logger.Debugf("签到成功,tooken:%s", service.GetToken())
 			s.StartDetect()
 		} else {
-			fmt.Println("向服务器签到失败")
+			logger.Debugf("向服务器签到失败\n")
 		}
 	})
 	for cmd != "quit" {
 		if cmd == "start" {
 			err := mq.Init(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.acceptQueues)
 			if nil != err {
-				log.Fatal(fmt.Printf("初始化mq发生异常,异常信息:\n%v", err))
+				logger.Errorf("初始化mq发生异常,异常信息:%v", err)
 			} else {
-				log.Printf("连接到mq服务器[%s:%d]成功\n", c.mqIP, c.mqPort)
+				logger.Debugf("连接到mq服务器[%s:%d]成功", c.mqIP, c.mqPort)
 				s.Notify = func(json string) {
 					mq.SendMsg(c.statusQueue, json)
 				}
 				regjosn := service.CreateRegisterMsg(c.clientKey)
 				mq.SendMsg(c.registerQueue, regjosn)
-				fmt.Printf("向服务器发送签到信息:%s\n", regjosn)
+				go func() {
+					for {
+						<-time.After(time.Duration(1) * time.Minute)
+						if registerResult == false {
+							logger.Debugf("重发签到:%s\n", regjosn)
+							mq.SendMsg(c.registerQueue, regjosn)
+						} else {
+							break
+						}
+					}
+				}()
+				logger.Debugf("向服务器发送签到信息:%s\n", regjosn)
 			}
 		} else if cmd == "stop" {
 			s.StopDetect()
 		} else {
-			fmt.Printf("未知命令:%s\n", cmd)
+			logger.Warringf("未知命令:%s\n", cmd)
 		}
 		println(ShowCmdInfo)
 		b, _, _ = inputReader.ReadLine()
@@ -74,7 +91,7 @@ func readConfig() *appConfig {
 	configInfo, err := tools.ReadConfigFile("./config.yml")
 	c := new(appConfig)
 	if nil != err {
-		fmt.Printf("读配置文件错误,错误信息:%v", err)
+		logger.Errorf("读配置文件错误,错误信息:%v", err)
 		return nil
 	}
 	c.mqIP = configInfo["mq.ip"].(string)

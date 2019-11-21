@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/fwhezfwhez/errorx"
 	"github.com/spf13/viper"
@@ -101,4 +102,7 @@ func ReadConfigFile(path string) (map[string]interface{}, error) {
 		allmap[key] = viper.Get(key)
 	}
 	return allmap, nil
+}
+func GetNow() string {
+	return time.Now().Format("2006-01-02 15:04:05")
 }
