@@ -51,7 +51,7 @@ func createHead(code, token string) MsgHead {
 }
 
 // CreateDetectMsg 创建检测消息
-func CreateDetectMsg(process []ProcessInfo, sys *system.SysUsedInfo, diskinfo []DiskSpaceInfo) string {
+func CreateDetectMsg(process []ProcessInfo, sys *system.SysUsedInfo, diskinfo []DiskSpaceInfo, systemName, ip string) string {
 
 	msgbody := new(MsgServerInfoBody)
 	d := time.Now()
@@ -64,6 +64,8 @@ func CreateDetectMsg(process []ProcessInfo, sys *system.SysUsedInfo, diskinfo []
 	msgbody.NetWork = -1
 	msgbody.ProcessCount = len(process)
 	msgbody.ProcessInfo = process
+	msgbody.ServerName = systemName
+	msgbody.ServerIP = ip
 
 	var msg Msg
 	var msghead MsgHead

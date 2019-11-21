@@ -2,6 +2,7 @@ package system
 
 import (
 	"fmt"
+	"net"
 	"strconv"
 	"strings"
 	tools "system_detect/tools"
@@ -120,4 +121,44 @@ func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 	}
 
 	return r, nil
+}
+
+// GetSystemName 获取系统名称
+func GetSystemName() string {
+	cmd := "uname -sn"
+	cmdresult, err := tools.ExecuteCommand(cmd)
+	if nil != err {
+		fmt.Printf("获取系统名称发生错误,执行[%s]命令错误", cmd)
+		return ""
+	}
+	return cmdresult
+}
+
+// GetLocalIp 获取系统中的IP地址
+func GetLocalIp() string {
+	netInterfaces, err := net.Interfaces()
+	if err != nil {
+		fmt.Println("net.Interfaces failed, err:", err.Error())
+		return ""
+	}
+	var ips = ""
+	c := len(netInterfaces)
+	for i := 0; i < c; i++ {
+		if (netInterfaces[i].Flags & net.FlagUp) != 0 {
+			addrs, _ := netInterfaces[i].Addrs()
+			for _, address := range addrs {
+				if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+					if ipnet.IP.To4() != nil {
+						fmt.Println(ipnet.IP.String())
+						if (i + 1) < c {
+							ips += (ipnet.IP.String() + ",")
+						} else {
+							ips += ipnet.IP.String()
+						}
+					}
+				}
+			}
+		}
+	}
+	return ips
 }

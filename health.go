@@ -15,9 +15,11 @@ type appConfig struct {
 	mqPort              int
 	mqUser              string
 	mqPwd               string
-	mqQueueName         string
-	mqSendQueueName     string
+	statusQueue         string
+	registerQueue       string
+	acceptQueues        string
 	collectTimeInterval int
+	clientKey           string
 }
 
 /**
@@ -25,8 +27,7 @@ type appConfig struct {
 	第一步启动一个线程,定时采集,时间间隔从配置文件中获取.
 **/
 func main() {
-
-	ShowCmdInfo := "please in put command:\nstart:开启服务 \n stop:停止服务\n"
+	ShowCmdInfo := "please in put command:\nstart:开启服务 \nstop:停止服务\n"
 	println(ShowCmdInfo)
 	inputReader := bufio.NewReader(os.Stdin)
 	b, _, _ := inputReader.ReadLine()
@@ -36,17 +37,27 @@ func main() {
 	mq := new(service.MQService)
 	service.Init()
 
+	service.SetRegisterCallback(func(result bool) {
+		if result {
+			fmt.Printf("签到成功,tooken:%s", service.GetToken())
+			s.StartDetect()
+		} else {
+			fmt.Println("向服务器签到失败")
+		}
+	})
 	for cmd != "quit" {
 		if cmd == "start" {
-			err := mq.Init(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.mqQueueName)
+			err := mq.Init(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.acceptQueues)
 			if nil != err {
 				log.Fatal(fmt.Printf("初始化mq发生异常,异常信息:\n%v", err))
 			} else {
 				log.Printf("连接到mq服务器[%s:%d]成功\n", c.mqIP, c.mqPort)
 				s.Notify = func(json string) {
-					mq.SendMsg(c.mqSendQueueName, json)
+					mq.SendMsg(c.statusQueue, json)
 				}
-				s.StartDetect()
+				regjosn := service.CreateRegisterMsg(c.clientKey)
+				mq.SendMsg(c.registerQueue, regjosn)
+				fmt.Printf("向服务器发送签到信息:%s\n", regjosn)
 			}
 		} else if cmd == "stop" {
 			s.StopDetect()
@@ -70,8 +81,10 @@ func readConfig() *appConfig {
 	c.mqPort = configInfo["mq.port"].(int)
 	c.mqUser = configInfo["mq.user"].(string)
 	c.mqPwd = configInfo["mq.pwd"].(string)
-	c.mqQueueName = configInfo["mq.queues"].(string)
-	c.mqSendQueueName = configInfo["mq.sendqueue"].(string)
+	c.statusQueue = configInfo["mq.status_queue"].(string)
+	c.registerQueue = configInfo["mq.register_queue"].(string)
 	c.collectTimeInterval = configInfo["collect.interval"].(int)
+	c.clientKey = configInfo["client.client_key"].(string)
+	c.acceptQueues = configInfo["mq.accept_queues"].(string)
 	return c
 }

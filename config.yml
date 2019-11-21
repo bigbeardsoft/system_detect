@@ -1,10 +1,12 @@
-mq: 
+mq:
   ip: 127.0.0.1
   port: 61613
   user: admin
   pwd: pwd
-  queues: A,B,C
-  sendqueue: d
+  accept_queues: SPF100001
+  register_queue: IFS100001
+  status_queue: IFS100010
 collect:
   interval: 5
-    
+client:
+  client_key: abc

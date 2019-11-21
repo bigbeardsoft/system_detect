@@ -3,18 +3,37 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"system_detect/service/deal"
+
+	"system_detect/service/parser"
 )
 
-var methods map[string]deal.DealResponse
+var methods map[string]parser.DealResponse
 
 // Init 初始化
 func Init() {
-	methods = make(map[string]deal.DealResponse, 2)
-	dreg := new(deal.DealReg)
+	methods = make(map[string]parser.DealResponse, 1)
+	dreg := new(parser.DealReg)
+	dreg.NotifyToken = f
 	methods[FRegCode] = dreg
-	dstat := new(deal.DealServerStatReport)
-	methods[FServerStatReport] = dstat
+}
+
+var token string
+
+var f = func(t string) {
+	token = t
+	go registerCallback(t != "")
+}
+
+var registerCallback func(result bool)
+
+// SetRegisterCallback 设置注册结果回调
+func SetRegisterCallback(callback func(result bool)) {
+	registerCallback = callback
+}
+
+// GetToken 获取从服务器上返回的token信息
+func GetToken() string {
+	return token
 }
 
 // DispatherMsg 解析消息并完成消息调度
@@ -32,7 +51,7 @@ func DispatherMsg(jsonstr string) error {
 	}
 	code := headMap["F"].(string)
 	if f, ok := methods[code]; ok {
-		f.Deal(tmp,nil)
+		f.Deal(tmp)
 	} else {
 		fmt.Printf("未实现[%s]协议的处理,json内容:%s", code, jsonstr)
 	}

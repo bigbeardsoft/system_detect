@@ -5,16 +5,20 @@ import (
 	"sync"
 	"system_detect/detect/process"
 	system "system_detect/detect/system/linux"
+	"time"
 
 	"github.com/fwhezfwhez/errorx"
 )
 
 // CollectService 系统检测
 type CollectService struct {
-	isRun  bool
-	mutex  sync.Mutex
-	Notify func(string)
+	isRun        bool
+	mutex        sync.Mutex
+	Notify       func(string)
+	TimeInterval int
 }
+
+var wg sync.WaitGroup
 
 // StartDetect 启动监测
 func (servicePoint *CollectService) StartDetect() {
@@ -24,11 +28,14 @@ func (servicePoint *CollectService) StartDetect() {
 		return
 	}
 	servicePoint.isRun = true
+
 	servicePoint.mutex.Unlock()
 	var sysUsed = new(system.SysUsedInfo)
 	var diskStatus system.DiskStatus
 	var paths []string
 	var prc = new(process.Process)
+	systenName := system.GetSystemName()
+	ip := system.GetLocalIp()
 	for servicePoint.isRun {
 		s, err := sysUsed.GetSystemUsedInfo()
 		if nil != err {
@@ -51,9 +58,10 @@ func (servicePoint *CollectService) StartDetect() {
 			}
 		}
 
-		result := CreateDetectMsg(pcc, s, xpath)
-		//println(result)
+		result := CreateDetectMsg(pcc, s, xpath, systenName, ip)
 		go servicePoint.Notify(result)
+
+		<-time.After(time.Duration(servicePoint.TimeInterval) * time.Second)
 	}
 }
 
