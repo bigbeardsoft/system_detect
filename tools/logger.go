@@ -1,20 +1,58 @@
 // tools 工具类,日志工具
 package tools
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 //Logger 日志
-type Logger struct{}
+type Logger struct {
+	logLevelMap map[string]string
+}
 
 const (
 	logDebug   = "DEBUG"
-	logError   = "ERROR"
 	logInfo    = "INFO"
 	logWarring = "WARRING"
+	logError   = "ERROR"
 )
 
+func (log *Logger) readConfig() {
+	configInfo, err := ReadConfigFile("./config.yml")
+	var loglevel string
+	log.logLevelMap = make(map[string]string, 4)
+	if nil != err {
+		log.Errorf("读配置文件错误,错误信息:%v", err)
+		loglevel = logInfo
+	} else {
+		loglevel = configInfo["log.loglevel"].(string)
+	}
+	loglevel = strings.ToUpper(loglevel)
+	log.logLevelMap[logDebug] = logDebug
+	log.logLevelMap[logInfo] = logInfo
+	log.logLevelMap[logWarring] = logWarring
+	log.logLevelMap[logError] = logError
+	if loglevel == logInfo {
+		delete(log.logLevelMap, logDebug)
+	} else if loglevel == logWarring {
+		delete(log.logLevelMap, logDebug)
+		delete(log.logLevelMap, logInfo)
+	} else if loglevel == logError {
+		delete(log.logLevelMap, logDebug)
+		delete(log.logLevelMap, logInfo)
+		delete(log.logLevelMap, logWarring)
+	}
+
+}
+
 func (log *Logger) writeLog(level, logInfo string) {
-	fmt.Printf("[%s][%s]%s\n", GetNow(), level, logInfo)
+	if log.logLevelMap == nil || len(log.logLevelMap) == 0 {
+		log.readConfig()
+	}
+	if _, ok := log.logLevelMap[level]; ok == true {
+		fmt.Printf("[%s][%s]%s\n", GetNow(), level, logInfo)
+	}
 }
 
 //Debug 调试日志

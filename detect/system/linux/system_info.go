@@ -32,7 +32,7 @@ func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 	resultstr := strings.Split(cmdresult, "\n")
 	var index int
 	for _, r := range resultstr {
-		r = strings.Trim(r, " \\r\\t\\n\\v\\f")
+		r = strings.Trim(r, " \r\t\n\v\f")
 		if "" != r && len(r) > 0 {
 			lines[index] = r
 			index++
@@ -58,7 +58,7 @@ func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 	for _, s := range cpuTokens {
 		r := tools.IsNumeric(s)
 		if r {
-			cpuInfo[i] = strings.Trim(s, " \\r\\t\\n\\v\\f")
+			cpuInfo[i] = strings.Trim(s, " \r\t\n\v\f")
 			i++
 		}
 		if i >= len(cpuInfo) {
@@ -79,7 +79,7 @@ func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 	for _, s := range memTokens {
 		r := tools.IsNumeric(s)
 		if r {
-			memInfo[i] = strings.Trim(s, " \\r\\t\\n\\v\\f")
+			memInfo[i] = strings.Trim(s, " \r\t\n\v\f")
 			i++
 		}
 		if i >= len(memInfo) {
@@ -90,7 +90,7 @@ func (p *SysUsedInfo) GetSystemUsedInfo() (*SysUsedInfo, error) {
 	for _, s := range memTokens {
 		r := tools.IsNumeric(s)
 		if r {
-			memInfo[i] = strings.Trim(s, " \\r\\t\\n\\v\\f")
+			memInfo[i] = strings.Trim(s, " \r\t\n\v\f")
 			i++
 		}
 		if i >= len(memInfo) {

@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"fmt"
 	"net"
+	"system_detect/tools"
 
 	"github.com/fwhezfwhez/errorx"
 	"github.com/go-stomp/stomp"
@@ -18,6 +19,8 @@ type MsgQueue struct {
 	user       string
 	password   string
 }
+
+var logger tools.Logger
 
 // Connect 连接到消息服务器,使用tcp的方式连接
 // host:主机地址
@@ -34,7 +37,7 @@ func (msgQueue *MsgQueue) connect(host, port, user, password string) (*stomp.Con
 		msgQueue.user = user
 		return conn, nil
 	} else {
-		fmt.Printf("连接到[%s:%s %s,%s]失败,错误信息:%v\n", host, port, user, password, err)
+		logger.Errorf("连接到[%s:%s %s,%s]失败,错误信息:%v\n", host, port, user, password, err)
 		return nil, errorx.New(err)
 	}
 }
@@ -73,9 +76,9 @@ func (msgQueue *MsgQueue) Send(queueName, msg string, conn *stomp.Conn) error {
 		return fmt.Errorf("connection is nil or not connected to server")
 	}
 	err := conn.Send(queueName, "text/plain", []byte(msg))
-	fmt.Println("send active mq " + queueName)
+	logger.Infof("send active mq %s", queueName)
 	if err != nil {
-		fmt.Println("active mq message send error: " + err.Error())
+		logger.Errorf("active mq message send error: " + err.Error())
 	}
 	return nil
 }
@@ -90,7 +93,7 @@ func (msgQueue *MsgQueue) Receive(sub *stomp.Subscription, callback func(msg, qu
 	if nil == sub {
 		return errorx.New(fmt.Errorf("subscription is nil"))
 	}
-	fmt.Printf(" ready to receive from [%s]\r\n", sub.Destination())
+	logger.Infof("ready to receive from [%s]", sub.Destination())
 
 	for {
 		v := <-sub.C
@@ -103,7 +106,7 @@ func (msgQueue *MsgQueue) Receive(sub *stomp.Subscription, callback func(msg, qu
 			break
 		}
 	}
-	fmt.Printf("end receive data\r\n")
+	logger.Infof("end receive data")
 	return nil
 }
 
@@ -120,7 +123,7 @@ func (msgQueue *MsgQueue) ConnectToServer(host, port, user, pwd string, queues [
 		return errorx.New(err)
 	}
 	if msgQueue == nil {
-		println("msgqueue is nil")
+		logger.Error("msgqueue is nil")
 	}
 	msgQueue.Connection = conn
 	msgQueue.Subs = list.New()

@@ -62,11 +62,13 @@ func IsNumeric(val interface{}) bool {
 	return false
 }
 
+var logger Logger
+
 // ExecuteCommand 执行linux命令
 func ExecuteCommand(cmdString string) (string, error) {
 	cmdwithpath, err := exec.LookPath("bash")
 	if err != nil {
-		fmt.Println("not find bash.")
+		logger.Error("not find bash.")
 		return "", errorx.New(err)
 	}
 
@@ -94,7 +96,6 @@ func ReadConfigFile(path string) (map[string]interface{}, error) {
 		return nil, errorx.New(err)
 	}
 	allkey := viper.AllKeys()
-	fmt.Printf("%v\n", allkey)
 
 	allmap := make(map[string]interface{}, len(allkey))
 
@@ -103,6 +104,8 @@ func ReadConfigFile(path string) (map[string]interface{}, error) {
 	}
 	return allmap, nil
 }
+
+// GetNow 获取当期日期和时间,格式:yyyy-MM-dd hh:mm:ss
 func GetNow() string {
 	return time.Now().Format("2006-01-02 15:04:05")
 }

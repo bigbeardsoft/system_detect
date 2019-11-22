@@ -42,7 +42,7 @@ func (p *Process) GetAllProcess() ([]Process, error) {
 		if err != nil {
 			break
 		}
-
+		line = strings.ReplaceAll(line, "\n", "")
 		tokens := strings.Split(line, " ")
 		ft := make([]string, 0)
 		for _, t := range tokens {

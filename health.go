@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"os"
 	"strconv"
 	"system_detect/service"
@@ -22,17 +23,27 @@ type appConfig struct {
 }
 
 var logger tools.Logger
+var command string = ""
+
+func init() {
+	flag.StringVar(&command, "command", "start", "启动服务")
+}
 
 /**
 说明:
 	第一步启动一个线程,定时采集,时间间隔从配置文件中获取.
 **/
 func main() {
-	ShowCmdInfo := "please in put command:\nstart:开启服务 \nstop:停止服务\n"
-	println(ShowCmdInfo)
+	flag.Parse()
+	ShowCmdInfo := "please in put command:\nstart:开启服务 \nstop:停止服务\nquit:退出系统"
 	inputReader := bufio.NewReader(os.Stdin)
-	b, _, _ := inputReader.ReadLine()
-	cmd := string(b)
+	cmd := command
+	var b []byte
+	if cmd == "" {
+		println(ShowCmdInfo)
+		b, _, _ = inputReader.ReadLine()
+		cmd = string(b)
+	}
 	s := new(service.CollectService)
 	c := readConfig()
 	mq := new(service.MQService)
@@ -53,38 +64,57 @@ func main() {
 	})
 	for cmd != "quit" {
 		if cmd == "start" {
+
 			err := mq.Init(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.acceptQueues)
 			if nil != err {
 				logger.Errorf("初始化mq发生异常,异常信息:%v", err)
-			} else {
-				logger.Debugf("连接到mq服务器[%s:%d]成功", c.mqIP, c.mqPort)
-				s.Notify = func(json string) {
-					mq.SendMsg(c.statusQueue, json)
-				}
-				regjosn := service.CreateRegisterMsg(c.clientKey)
-				mq.SendMsg(c.registerQueue, regjosn)
 				go func() {
-					for {
-						<-time.After(time.Duration(1) * time.Minute)
-						if registerResult == false {
-							logger.Debugf("重发签到:%s\n", regjosn)
-							mq.SendMsg(c.registerQueue, regjosn)
+					for cmd != "quit" {
+						err = mq.Init(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.acceptQueues)
+						if nil != err {
+							logger.Errorf("连接到mq发生异常,异常信息:%v", err)
 						} else {
+							logger.Debugf("连接到mq服务器[%s:%d]成功", c.mqIP, c.mqPort)
+							sendReg(mq, s, c, registerResult)
 							break
 						}
+						<-time.After(time.Duration(1) * time.Minute)
 					}
 				}()
-				logger.Debugf("向服务器发送签到信息:%s\n", regjosn)
+			} else {
+				logger.Debugf("连接到mq服务器[%s:%d]成功", c.mqIP, c.mqPort)
+				sendReg(mq, s, c, registerResult)
+
 			}
 		} else if cmd == "stop" {
 			s.StopDetect()
 		} else {
 			logger.Warringf("未知命令:%s\n", cmd)
 		}
-		println(ShowCmdInfo)
+		//println(ShowCmdInfo)
 		b, _, _ = inputReader.ReadLine()
 		cmd = string(b)
 	}
+}
+
+func sendReg(mq *service.MQService, s *service.CollectService, c *appConfig, registerResult bool) {
+	s.Notify = func(json string) {
+		mq.SendMsg(c.statusQueue, json)
+	}
+	regjosn := service.CreateRegisterMsg(c.clientKey)
+	mq.SendMsg(c.registerQueue, regjosn)
+	go func() {
+		for {
+			<-time.After(time.Duration(1) * time.Minute)
+			if registerResult == false {
+				logger.Debugf("重发签到:%s\n", regjosn)
+				mq.SendMsg(c.registerQueue, regjosn)
+			} else {
+				break
+			}
+		}
+	}()
+	logger.Debugf("向服务器发送签到信息:%s\n", regjosn)
 }
 
 func readConfig() *appConfig {
