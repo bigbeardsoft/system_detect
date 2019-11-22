@@ -64,34 +64,24 @@ func main() {
 	})
 	for cmd != "quit" {
 		if cmd == "start" {
-
-			err := mq.Init(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.acceptQueues)
-			if nil != err {
-				logger.Errorf("初始化mq发生异常,异常信息:%v", err)
-				go func() {
-					for cmd != "quit" {
-						err = mq.Init(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.acceptQueues)
-						if nil != err {
-							logger.Errorf("连接到mq发生异常,异常信息:%v", err)
-						} else {
-							logger.Debugf("连接到mq服务器[%s:%d]成功", c.mqIP, c.mqPort)
-							sendReg(mq, s, c, registerResult)
-							break
-						}
-						<-time.After(time.Duration(1) * time.Minute)
+			go func() {
+				for cmd != "quit" {
+					err := mq.Init(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.acceptQueues)
+					if nil != err {
+						logger.Errorf("连接到mq发生异常,异常信息:%v", err)
+					} else {
+						logger.Debugf("连接到mq服务器[%s:%d]成功", c.mqIP, c.mqPort)
+						sendReg(mq, s, c, registerResult)
+						break
 					}
-				}()
-			} else {
-				logger.Debugf("连接到mq服务器[%s:%d]成功", c.mqIP, c.mqPort)
-				sendReg(mq, s, c, registerResult)
-
-			}
+					<-time.After(time.Duration(1) * time.Minute)
+				}
+			}()
 		} else if cmd == "stop" {
 			s.StopDetect()
 		} else {
 			logger.Warringf("未知命令:%s\n", cmd)
 		}
-		//println(ShowCmdInfo)
 		b, _, _ = inputReader.ReadLine()
 		cmd = string(b)
 	}
