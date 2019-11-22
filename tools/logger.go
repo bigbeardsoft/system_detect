@@ -3,13 +3,19 @@ package tools
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
+	"time"
 )
 
 //Logger 日志
 type Logger struct {
 	logLevelMap map[string]string
 }
+
+var logPath string
 
 const (
 	logDebug   = "DEBUG"
@@ -51,7 +57,26 @@ func (log *Logger) writeLog(level, logInfo string) {
 		log.readConfig()
 	}
 	if _, ok := log.logLevelMap[level]; ok == true {
-		fmt.Printf("[%s][%s]%s\n", GetNow(), level, logInfo)
+		str := fmt.Sprintf("[%s][%s]%s\n", GetNow(), level, logInfo)
+		println(str)
+		baseDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+		if err != nil {
+			baseDir = "./log"
+		} else {
+			baseDir = fmt.Sprintf("%s/log/", baseDir)
+		}
+		if ok := PathExists(baseDir); ok == false {
+			err = os.Mkdir(baseDir, os.ModePerm)
+			if err != nil {
+				fmt.Printf("创建文件夹失败,错误信息:%v", err)
+				return
+			}
+		}
+		logPath = fmt.Sprintf("%s/%s_%s.log", baseDir, level, time.Now().Format("2006-01-02_15"))
+		data := []byte(str)
+		if err = ioutil.WriteFile(logPath, data, 0644); err != nil {
+			fmt.Printf("写日志失败,错误信息:%v", err)
+		}
 	}
 }
 

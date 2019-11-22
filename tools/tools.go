@@ -3,6 +3,7 @@ package tools
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -108,4 +109,16 @@ func ReadConfigFile(path string) (map[string]interface{}, error) {
 // GetNow 获取当期日期和时间,格式:yyyy-MM-dd hh:mm:ss
 func GetNow() string {
 	return time.Now().Format("2006-01-02 15:04:05")
+}
+
+//  PathExists 判断文件夹是否存在
+func PathExists(path string) bool {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	return false
 }

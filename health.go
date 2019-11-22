@@ -24,6 +24,7 @@ type appConfig struct {
 
 var logger tools.Logger
 var command string = ""
+var registerResult bool = false
 
 func init() {
 	flag.StringVar(&command, "command", "start", "启动服务")
@@ -52,7 +53,6 @@ func main() {
 		logger.Debugf("收到:%v\n", msg)
 		service.DispatherMsg(msg)
 	}
-	registerResult := false
 	service.SetRegisterCallback(func(result bool) {
 		registerResult = result
 		if result {
@@ -66,12 +66,15 @@ func main() {
 		if cmd == "start" {
 			go func() {
 				for cmd != "quit" {
-					err := mq.Init(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.acceptQueues)
+					err := mq.Open(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.acceptQueues)
 					if nil != err {
 						logger.Errorf("连接到mq发生异常,异常信息:%v", err)
 					} else {
 						logger.Debugf("连接到mq服务器[%s:%d]成功", c.mqIP, c.mqPort)
-						sendReg(mq, s, c, registerResult)
+						s.Notify = func(json string) {
+							mq.SendMsg(c.statusQueue, json)
+						}
+						sendReg(mq, c.clientKey, c.registerQueue)
 						break
 					}
 					<-time.After(time.Duration(1) * time.Minute)
@@ -79,6 +82,8 @@ func main() {
 			}()
 		} else if cmd == "stop" {
 			s.StopDetect()
+			s.Notify = nil
+			mq.Close()
 		} else {
 			logger.Warringf("未知命令:%s\n", cmd)
 		}
@@ -87,24 +92,20 @@ func main() {
 	}
 }
 
-func sendReg(mq *service.MQService, s *service.CollectService, c *appConfig, registerResult bool) {
-	s.Notify = func(json string) {
-		mq.SendMsg(c.statusQueue, json)
-	}
-	regjosn := service.CreateRegisterMsg(c.clientKey)
-	mq.SendMsg(c.registerQueue, regjosn)
+func sendReg(mq *service.MQService, clientKey, registerQueue string) {
+	regjson := service.CreateRegisterMsg(clientKey)
 	go func() {
 		for {
-			<-time.After(time.Duration(1) * time.Minute)
+			mq.SendMsg(registerQueue, regjson)
+			logger.Debugf("向服务器发送签到信息:%s\n", regjson)
 			if registerResult == false {
-				logger.Debugf("重发签到:%s\n", regjosn)
-				mq.SendMsg(c.registerQueue, regjosn)
+				logger.Debugf("未收到签到回复或者签到失败,重发签到:%s\n", regjson)
+				<-time.After(time.Duration(1) * time.Minute)
 			} else {
 				break
 			}
 		}
 	}()
-	logger.Debugf("向服务器发送签到信息:%s\n", regjosn)
 }
 
 func readConfig() *appConfig {

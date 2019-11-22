@@ -150,7 +150,9 @@ func (msgQueue *MsgQueue) Disconnect() {
 			}
 		}
 	}
-	msgQueue.Connection.Disconnect()
+	if msgQueue.Connection != nil {
+		msgQueue.Connection.Disconnect()
+	}
 }
 
 //SendMsg 发送消息到消息队列

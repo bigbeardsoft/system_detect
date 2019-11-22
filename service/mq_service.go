@@ -10,12 +10,12 @@ import (
 
 // MQService 处理消息服务器
 type MQService struct {
-	msgqueue activemq.MsgQueue
+	msgqueue *activemq.MsgQueue
 	Callback func(msg, queueName string)
 }
 
-// Init 初始化
-func (msv *MQService) Init(host, port, user, pwd, queueName string) error {
+// Open 初始化
+func (msv *MQService) Open(host, port, user, pwd, queueName string) error {
 	queueNames := strings.Split(queueName, ",")
 	err := msv.msgqueue.ConnectToServer(host, port, user, pwd, queueNames, msv.Callback)
 	if nil != err {
@@ -27,4 +27,11 @@ func (msv *MQService) Init(host, port, user, pwd, queueName string) error {
 // SendToMQServer 链接到服务
 func (msv *MQService) SendMsg(queueName, msg string) {
 	msv.msgqueue.SendMsg(queueName, msg)
+}
+
+// Close 关闭连接
+func (msv *MQService) Close() {
+	if msv.msgqueue != nil {
+		msv.msgqueue.Disconnect()
+	}
 }
