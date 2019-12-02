@@ -75,8 +75,8 @@ func (msgQueue *MsgQueue) Send(queueName, msg string, conn *stomp.Conn) error {
 	if nil == conn {
 		return fmt.Errorf("connection is nil or not connected to server")
 	}
-	err := conn.Send(queueName, "text/plain", []byte(msg))
-	logger.Infof("send active mq %s", queueName)
+	err := conn.Send(queueName, "", []byte(msg))
+	logger.Infof("send active mq %s-->%s", queueName, msg)
 	if err != nil {
 		logger.Errorf("active mq message send error: " + err.Error())
 	}
@@ -122,8 +122,8 @@ func (msgQueue *MsgQueue) ConnectToServer(host, port, user, pwd string, queues [
 	if err != nil {
 		return errorx.New(err)
 	}
-	if msgQueue == nil {
-		logger.Error("msgqueue is nil")
+	if queues == nil {
+		logger.Error("queues is nil")
 	}
 	msgQueue.Connection = conn
 	msgQueue.Subs = list.New()

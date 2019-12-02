@@ -17,6 +17,7 @@ type MQService struct {
 // Open 初始化
 func (msv *MQService) Open(host, port, user, pwd, queueName string) error {
 	queueNames := strings.Split(queueName, ",")
+	msv.msgqueue = new(activemq.MsgQueue)
 	err := msv.msgqueue.ConnectToServer(host, port, user, pwd, queueNames, msv.Callback)
 	if nil != err {
 		return errorx.GroupErrors(fmt.Errorf("连接到服务器[%s:%s]失败,错误信息:%v", host, port, err))
@@ -24,9 +25,10 @@ func (msv *MQService) Open(host, port, user, pwd, queueName string) error {
 	return nil
 }
 
-// SendToMQServer 链接到服务
+// SendMsg 发送消息
 func (msv *MQService) SendMsg(queueName, msg string) {
 	msv.msgqueue.SendMsg(queueName, msg)
+	//logger.Debug("发送:" + msg)
 }
 
 // Close 关闭连接

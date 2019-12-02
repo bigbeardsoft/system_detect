@@ -48,6 +48,7 @@ func main() {
 	s := new(service.CollectService)
 	c := readConfig()
 	mq := new(service.MQService)
+
 	service.Init()
 	mq.Callback = func(msg, queue string) {
 		logger.Debugf("收到:%v\n", msg)
@@ -98,9 +99,10 @@ func sendReg(mq *service.MQService, clientKey, registerQueue string) {
 		for {
 			mq.SendMsg(registerQueue, regjson)
 			logger.Debugf("向服务器发送签到信息:%s\n", regjson)
+			<-time.After(time.Duration(5) * time.Second)
 			if registerResult == false {
 				logger.Debugf("未收到签到回复或者签到失败,重发签到:%s\n", regjson)
-				<-time.After(time.Duration(1) * time.Minute)
+				//<-time.After(time.Duration(1) * time.Minute)
 			} else {
 				break
 			}

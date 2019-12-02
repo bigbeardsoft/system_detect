@@ -10,6 +10,12 @@ import (
 	"github.com/go-stomp/stomp"
 )
 
+// func testTopic() {
+// 	m := topic.Manager()
+// 	m2 := topic.Topic()
+
+// }
+
 // 使用IP和端口连接到ActiveMQ服务器
 // 返回ActiveMQ连接对象
 func connActiveMq(host, port string) (stompConn *stomp.Conn) { // @todo 实现断开重连
