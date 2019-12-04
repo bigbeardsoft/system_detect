@@ -41,7 +41,7 @@ func init() {
 **/
 func main() {
 	flag.Parse()
-	ShowCmdInfo := "please in put command:\nstart:开启服务 \nstop:停止服务\nquit:退出系统"
+	ShowCmdInfo := "please in put command:\n\tstart:开启服务 \n\tstop:停止服务\n\tquit:退出系统"
 	inputReader := bufio.NewReader(os.Stdin)
 	cmd := start
 	var b []byte
@@ -90,12 +90,13 @@ func main() {
 			s.StopDetect()
 			s.Notify = nil
 			mq.Close()
+		} else if cmd == "help" {
+			println(ShowCmdInfo)
 		} else {
 			if cmd != "" {
 				logger.Warringf("未知命令:%s\n", cmd)
 			}
 		}
-		println(ShowCmdInfo)
 		b, _, _ = inputReader.ReadLine()
 		cmd = string(b)
 	}
