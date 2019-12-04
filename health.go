@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"flag"
-	"fmt"
 	"os"
 	"strconv"
 	"system_detect/service"
@@ -92,11 +91,11 @@ func main() {
 			s.Notify = nil
 			mq.Close()
 		} else {
-			if len(cmd) > 0 {
+			if cmd != "" {
 				logger.Warringf("未知命令:%s\n", cmd)
 			}
 		}
-		fmt.Printf("请输入指令:\n")
+		println(ShowCmdInfo)
 		b, _, _ = inputReader.ReadLine()
 		cmd = string(b)
 	}
