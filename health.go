@@ -106,12 +106,15 @@ func sendReg(mq *service.MQService, clientKey, registerQueue string) {
 	regjson := service.CreateRegisterMsg(clientKey)
 	go func() {
 		for {
-			mq.SendMsg(registerQueue, regjson)
+			err := mq.SendMsg(registerQueue, regjson)
+			if err != nil {
+				logger.Debugf("发送注册信息发生错误,错误信息:%v", err)
+				break
+			}
 			logger.Debugf("向服务器发送签到信息:%s\n", regjson)
 			<-time.After(time.Duration(10) * time.Second)
 			if registerResult == false {
 				logger.Debugf("未收到签到回复或者签到失败,重发签到:%s\n", regjson)
-				//<-time.After(time.Duration(1) * time.Minute)
 			} else {
 				break
 			}

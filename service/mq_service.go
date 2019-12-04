@@ -26,9 +26,8 @@ func (msv *MQService) Open(host, port, user, pwd, queueName string) error {
 }
 
 // SendMsg 发送消息
-func (msv *MQService) SendMsg(queueName, msg string) {
-	msv.msgqueue.SendMsg(queueName, msg)
-	//logger.Debug("发送:" + msg)
+func (msv *MQService) SendMsg(queueName, msg string) error {
+	return msv.msgqueue.SendMsg(queueName, msg)
 }
 
 // Close 关闭连接
