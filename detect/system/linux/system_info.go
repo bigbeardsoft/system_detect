@@ -1,7 +1,6 @@
 package system
 
 import (
-	"fmt"
 	"net"
 	"strconv"
 	"strings"
@@ -146,7 +145,6 @@ func GetLocalIP() string {
 			for _, address := range addrs {
 				if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 					if ipnet.IP.To4() != nil {
-						fmt.Println(ipnet.IP.String())
 						if (i + 1) < c {
 							ips += (ipnet.IP.String() + ",")
 						} else {

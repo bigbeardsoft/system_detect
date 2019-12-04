@@ -16,6 +16,7 @@ type Logger struct {
 }
 
 var logPath string
+var showlog bool
 
 const (
 	logDebug   = "DEBUG"
@@ -25,15 +26,18 @@ const (
 )
 
 func (log *Logger) readConfig() {
-	configInfo, err := ReadConfigFile("./config.yml")
+	configInfo, err := ReadConfigFile("./health_config.yml")
 	var loglevel string
-	log.logLevelMap = make(map[string]string, 4)
 	if nil != err {
 		log.Errorf("读配置文件错误,错误信息:%v", err)
 		loglevel = logInfo
+		showlog = false
 	} else {
 		loglevel = configInfo["log.loglevel"].(string)
+		showlog = configInfo["log.showlog"].(bool)
 	}
+	log.logLevelMap = make(map[string]string, 4)
+
 	loglevel = strings.ToUpper(loglevel)
 	log.logLevelMap[logDebug] = logDebug
 	log.logLevelMap[logInfo] = logInfo
@@ -58,10 +62,9 @@ func (log *Logger) writeLog(level, logInfo string) {
 	}
 	if _, ok := log.logLevelMap[level]; ok == true {
 		str := fmt.Sprintf("[%s][%s]%s\n", GetNow(), level, logInfo)
-		println(str)
 		baseDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 		if err != nil {
-			baseDir = "./log"
+			baseDir = "./log/"
 		} else {
 			baseDir = fmt.Sprintf("%s/log/", baseDir)
 		}
@@ -72,10 +75,13 @@ func (log *Logger) writeLog(level, logInfo string) {
 				return
 			}
 		}
-		logPath = fmt.Sprintf("%s/%s_%s.log", baseDir, level, time.Now().Format("2006-01-02_15"))
+		logPath = fmt.Sprintf("%s%s_%s.log", baseDir, level, time.Now().Format("2006-01-02_15"))
 		data := []byte(str)
 		if err = ioutil.WriteFile(logPath, data, 0644); err != nil {
 			fmt.Printf("写日志失败,错误信息:%v", err)
+		}
+		if showlog {
+			fmt.Println(str)
 		}
 	}
 }

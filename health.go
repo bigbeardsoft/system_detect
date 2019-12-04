@@ -20,6 +20,7 @@ type appConfig struct {
 	acceptQueues        string
 	collectTimeInterval int
 	clientKey           string
+	showlog             bool
 }
 
 var logger tools.Logger
@@ -99,7 +100,7 @@ func sendReg(mq *service.MQService, clientKey, registerQueue string) {
 		for {
 			mq.SendMsg(registerQueue, regjson)
 			logger.Debugf("向服务器发送签到信息:%s\n", regjson)
-			<-time.After(time.Duration(5) * time.Second)
+			<-time.After(time.Duration(10) * time.Second)
 			if registerResult == false {
 				logger.Debugf("未收到签到回复或者签到失败,重发签到:%s\n", regjson)
 				//<-time.After(time.Duration(1) * time.Minute)
@@ -111,7 +112,7 @@ func sendReg(mq *service.MQService, clientKey, registerQueue string) {
 }
 
 func readConfig() *appConfig {
-	configInfo, err := tools.ReadConfigFile("./config.yml")
+	configInfo, err := tools.ReadConfigFile("./health_config.yml")
 	c := new(appConfig)
 	if nil != err {
 		logger.Errorf("读配置文件错误,错误信息:%v", err)
