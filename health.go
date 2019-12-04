@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"flag"
+	"fmt"
 	"os"
 	"strconv"
 	"system_detect/service"
@@ -24,11 +25,15 @@ type appConfig struct {
 }
 
 var logger tools.Logger
-var command string = ""
+var start string = ""
 var registerResult bool = false
+var stop string = ""
+var quit string = ""
 
 func init() {
-	flag.StringVar(&command, "command", "start", "启动服务")
+	flag.StringVar(&start, "start", "start", "启动服务")
+	flag.StringVar(&stop, "stop", "", "停止服务")
+	flag.StringVar(&quit, "quit", "", "退出服务")
 }
 
 /**
@@ -39,7 +44,7 @@ func main() {
 	flag.Parse()
 	ShowCmdInfo := "please in put command:\nstart:开启服务 \nstop:停止服务\nquit:退出系统"
 	inputReader := bufio.NewReader(os.Stdin)
-	cmd := command
+	cmd := start
 	var b []byte
 	if cmd == "" {
 		println(ShowCmdInfo)
@@ -87,8 +92,11 @@ func main() {
 			s.Notify = nil
 			mq.Close()
 		} else {
-			logger.Warringf("未知命令:%s\n", cmd)
+			if len(cmd) > 0 {
+				logger.Warringf("未知命令:%s\n", cmd)
+			}
 		}
+		fmt.Printf("请输入指令:\n")
 		b, _, _ = inputReader.ReadLine()
 		cmd = string(b)
 	}
