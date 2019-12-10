@@ -2,3 +2,4 @@ __debug_bin
 .vscode/launch.json
 health
 *.log
+.vscode/settings.json
