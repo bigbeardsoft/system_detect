@@ -59,7 +59,6 @@ func IsNumeric(val interface{}) bool {
 		}
 		return true
 	}
-
 	return false
 }
 
@@ -111,7 +110,7 @@ func GetNow() string {
 	return time.Now().Format("2006-01-02 15:04:05")
 }
 
-//  PathExists 判断文件夹是否存在
+//PathExists 判断文件夹是否存在
 func PathExists(path string) bool {
 	_, err := os.Stat(path)
 	if err == nil {
