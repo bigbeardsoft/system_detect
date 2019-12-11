@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"system_detect/service"
 	"system_detect/tools"
+	"system_detect/web"
 	"time"
 )
 
@@ -40,6 +41,10 @@ func init() {
 	第一步启动一个线程,定时采集,时间间隔从配置文件中获取.
 **/
 func main() {
+
+	web.StartWebServer()
+	return
+
 	flag.Parse()
 	ShowCmdInfo := "please in put command:\n\tstart:开启服务 \n\tstop:停止服务\n\tquit:退出系统"
 	inputReader := bufio.NewReader(os.Stdin)
