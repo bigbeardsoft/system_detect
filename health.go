@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"system_detect/service"
 	"system_detect/tools"
-	"system_detect/web"
 	"time"
 )
 
@@ -42,8 +41,8 @@ func init() {
 **/
 func main() {
 
-	web.StartWebServer()
-	return
+	// web.StartWebServer()
+	// return
 
 	flag.Parse()
 	ShowCmdInfo := "please in put command:\n\tstart:开启服务 \n\tstop:停止服务\n\tquit:退出系统"
