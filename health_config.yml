@@ -13,3 +13,5 @@ client:
 log:
   loglevel: debug
   showlog: false
+web:
+  port: 19001

@@ -3,7 +3,6 @@ package tools
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -76,14 +75,26 @@ func (log *Logger) writeLog(level, logInfo string) {
 			}
 		}
 		logPath = fmt.Sprintf("%s%s_%s.log", baseDir, level, time.Now().Format("2006-01-02_15"))
-		data := []byte(str)
-		if err = ioutil.WriteFile(logPath, data, 0644); err != nil {
+		//data := []byte(str)
+		// if err = ioutil.WriteFile(logPath, data, 0644); err != nil {
+		// 	fmt.Printf("写日志失败,错误信息:%v", err)
+		// }
+		e := writeFile(str, logPath)
+		if e != nil {
 			fmt.Printf("写日志失败,错误信息:%v", err)
 		}
 		if showlog {
 			fmt.Println(str)
 		}
 	}
+}
+
+func writeFile(content, path string) error {
+	fd, e := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	buf := []byte(content)
+	fd.Write(buf)
+	fd.Close()
+	return e
 }
 
 //Debug 调试日志
@@ -116,6 +127,12 @@ func (log *Logger) Error(value string) {
 //Errorf 格式化输出
 func (log *Logger) Errorf(formater string, value ...interface{}) {
 	str := fmt.Sprintf(formater, value...)
+	log.Error(str)
+}
+
+//ErrorX 输出错误日志
+func (log *Logger) ErrorX(e error) {
+	str := fmt.Sprintf("%v", e)
 	log.Error(str)
 }
 

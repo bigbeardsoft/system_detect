@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	tools "system_detect/tools"
 
 	"system_detect/service/parser"
 )
@@ -45,10 +46,17 @@ func DispatherMsg(jsonstr string) error {
 		return err
 	}
 	headMap := tmp["H"].(map[string]interface{})
+
+	serviceCode := headMap["C"].(string)
+	if serviceCode != tools.GetServiceCode() {
+		return nil
+	}
+
 	headResult, err := checkHead(headMap)
 	if headResult == false {
 		return err
 	}
+
 	code := headMap["F"].(string)
 	if f, ok := methods[code]; ok {
 		f.Deal(tmp)
@@ -63,8 +71,7 @@ func checkHead(head map[string]interface{}) (bool, error) {
 	returnResult := head["R"]
 	if returnResult == false {
 		returnMsg := head["M"]
-		returnCode := head["C"]
-		return false, fmt.Errorf("服务器返回错误,错误编码:%s,错误描述:%s", returnCode, returnMsg)
+		return false, fmt.Errorf("服务器返回错误,错误描述:%s", returnMsg)
 	}
 	version := head["V"]
 	if version != ProtocolVersion {

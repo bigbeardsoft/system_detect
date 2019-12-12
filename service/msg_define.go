@@ -25,6 +25,7 @@ type MsgHead struct {
 	S uint64
 	T int
 	I int
+	C string
 }
 
 // MsgRegBody 注册消息体

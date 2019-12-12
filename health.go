@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"system_detect/service"
 	"system_detect/tools"
+	"system_detect/web"
 	"time"
 )
 
@@ -19,8 +20,9 @@ type appConfig struct {
 	registerQueue       string
 	acceptQueues        string
 	collectTimeInterval int
-	clientKey           string
+	serviceCode         string
 	showlog             bool
+	webPort             int
 }
 
 var logger tools.Logger
@@ -40,9 +42,6 @@ func init() {
 	第一步启动一个线程,定时采集,时间间隔从配置文件中获取.
 **/
 func main() {
-
-	// web.StartWebServer()
-	// return
 
 	flag.Parse()
 	ShowCmdInfo := "please in put command:\n\tstart:开启服务 \n\tstop:停止服务\n\tquit:退出系统"
@@ -72,6 +71,9 @@ func main() {
 			logger.Debugf("向服务器签到失败\n")
 		}
 	})
+	logger.Info("启动web服务")
+	go web.StartWebServer(c.webPort)
+	logger.Info("启动本地采集")
 	for cmd != "quit" {
 		if cmd == "start" {
 			go func() {
@@ -84,7 +86,7 @@ func main() {
 						s.Notify = func(json string) {
 							mq.SendMsg(c.statusQueue, json)
 						}
-						sendReg(mq, c.clientKey, c.registerQueue)
+						sendReg(mq, c.serviceCode, c.registerQueue)
 						break
 					}
 					<-time.After(time.Duration(1) * time.Minute)
@@ -140,7 +142,9 @@ func readConfig() *appConfig {
 	c.statusQueue = configInfo["mq.status_queue"].(string)
 	c.registerQueue = configInfo["mq.register_queue"].(string)
 	c.collectTimeInterval = configInfo["collect.interval"].(int)
-	c.clientKey = configInfo["client.client_key"].(string)
+	c.serviceCode = configInfo["client.client_key"].(string)
 	c.acceptQueues = configInfo["mq.accept_queues"].(string)
+	c.webPort = configInfo["web.port"].(int)
+	tools.SetServiceCode(c.serviceCode)
 	return c
 }
