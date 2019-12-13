@@ -88,10 +88,12 @@ func (msgQueue *MsgQueue) SendTopic(queue, msg string, conn *stomp.Conn) error {
 	if nil == conn {
 		return fmt.Errorf("connection is nil or not connected to server")
 	}
-	err := conn.Send(queue, "", []byte(msg))
+	queueName := fmt.Sprintf("/topic/%s", queue)
+	err := conn.Send(queueName, "", []byte(msg))
 	if err != nil {
 		logger.Errorf("active mq message send error: " + err.Error())
 	}
+	logger.Debugf("Send data to %s : %s ", queueName, msg)
 	return err
 }
 
