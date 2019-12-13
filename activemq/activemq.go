@@ -80,7 +80,19 @@ func (msgQueue *MsgQueue) Send(queueName, msg string, conn *stomp.Conn) error {
 	if err != nil {
 		logger.Errorf("active mq message send error: " + err.Error())
 	}
-	return nil
+	return err
+}
+
+//SendTopic 发送主题信息(此方法有bug,无法发送到主题)
+func (msgQueue *MsgQueue) SendTopic(queue, msg string, conn *stomp.Conn) error {
+	if nil == conn {
+		return fmt.Errorf("connection is nil or not connected to server")
+	}
+	err := conn.Send(queue, "", []byte(msg))
+	if err != nil {
+		logger.Errorf("active mq message send error: " + err.Error())
+	}
+	return err
 }
 
 //Receive 接收队列消息,需要采用异步或者多线程的方式调用本函数,否则会阻塞
@@ -165,5 +177,6 @@ func (msgQueue *MsgQueue) SendMsg(queueName, msg string) error {
 	if msgQueue.Connection == nil {
 		return fmt.Errorf("连接未初始化")
 	}
-	return msgQueue.Send(queueName, msg, msgQueue.Connection)
+	return msgQueue.SendTopic(queueName, msg, msgQueue.Connection)
+
 }
