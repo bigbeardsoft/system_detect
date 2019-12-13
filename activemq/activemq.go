@@ -83,7 +83,7 @@ func (msgQueue *MsgQueue) Send(queueName, msg string, conn *stomp.Conn) error {
 	return err
 }
 
-//SendTopic 发送主题信息(此方法有bug,无法发送到主题)
+//SendTopic 发送主题信息
 func (msgQueue *MsgQueue) SendTopic(queue, msg string, conn *stomp.Conn) error {
 	if nil == conn {
 		return fmt.Errorf("connection is nil or not connected to server")
