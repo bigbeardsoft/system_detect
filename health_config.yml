@@ -12,6 +12,6 @@ client:
   client_key: A3320000001
 log:
   loglevel: debug
-  showlog: false
+  showlog: true
 web:
   port: 19001

@@ -137,7 +137,7 @@ func connectToServerB(host, port, user, pwd string, queues []string) {
 			index, _, _ := inputReader.ReadLine()
 			ivalue, err := strconv.Atoi(string(index))
 			if err == nil {
-				errx := a.SendMsg(queues[ivalue], send)
+				errx := a.SendToQueue(queues[ivalue], send)
 				if errx != nil {
 					println("send error,error info :" + errx.Error())
 				}
