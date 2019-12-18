@@ -133,7 +133,7 @@ func (msgQueue *MsgQueue) SendToQueue(queue, msg string) error {
 //   callback:回调函数
 // 返回:
 //   error:错误信息
-func (msgQueue *MsgQueue) Receive(sub *stomp.Subscription, callback func(msg, queueName string)) error {
+func (msgQueue *MsgQueue) receive(sub *stomp.Subscription, callback func(msg, queueName string)) error {
 	if nil == sub {
 		return errorx.New(fmt.Errorf("subscription is nil"))
 	}
@@ -187,7 +187,7 @@ func (msgQueue *MsgQueue) subscribe(queues []string, queueType string, callback 
 		sub, err := msgQueue.Connection.Subscribe(q, stomp.AckMode(stomp.AckAuto))
 		if nil == err {
 			msgQueue.Subs.PushBack(sub)
-			go msgQueue.Receive(sub, callback)
+			go msgQueue.receive(sub, callback)
 		} else {
 			return errorx.New(err)
 		}
