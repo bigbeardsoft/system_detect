@@ -26,6 +26,7 @@ type MsgHead struct {
 	T int
 	I int
 	C string
+	E bool
 }
 
 // MsgRegBody 注册消息体

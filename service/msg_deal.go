@@ -47,6 +47,7 @@ func createHead(code, token string) MsgHead {
 	m.I = 1
 	m.M = ""
 	m.C = tools.GetServiceCode()
+	m.E = false
 	return m
 }
 
