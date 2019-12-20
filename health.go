@@ -5,6 +5,7 @@ import (
 	"flag"
 	"os"
 	"strconv"
+	"strings"
 	"system_detect/service"
 	"system_detect/tools"
 	"system_detect/web"
@@ -18,7 +19,7 @@ type appConfig struct {
 	mqPwd               string
 	statusQueue         string
 	registerQueue       string
-	acceptQueues        string
+	acceptTopics        string
 	collectTimeInterval int
 	serviceCode         string
 	showlog             bool
@@ -78,11 +79,13 @@ func main() {
 		if cmd == "start" {
 			go func() {
 				for cmd != "quit" {
-					err := mq.Open(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, c.acceptQueues)
+					err := mq.Open(c.mqIP, strconv.Itoa(c.mqPort), c.mqUser, c.mqPwd, "")
 					if nil != err {
 						logger.Errorf("连接到mq发生异常,异常信息:%v", err)
 					} else {
 						logger.Debugf("连接到mq服务器[%s:%d]成功", c.mqIP, c.mqPort)
+						topicName := strings.Split(c.acceptTopics, ",")
+						mq.SubscribeTopic(topicName)
 						s.Notify = func(json string) {
 							mq.SendMsg(c.statusQueue, json)
 						}
@@ -139,11 +142,11 @@ func readConfig() *appConfig {
 	c.mqPort = configInfo["mq.port"].(int)
 	c.mqUser = configInfo["mq.user"].(string)
 	c.mqPwd = configInfo["mq.pwd"].(string)
-	c.statusQueue = configInfo["mq.status_queue"].(string)
-	c.registerQueue = configInfo["mq.register_queue"].(string)
+	c.statusQueue = configInfo["mq.queues.status_queue"].(string)
+	c.registerQueue = configInfo["mq.queues.register_queue"].(string)
 	c.collectTimeInterval = configInfo["collect.interval"].(int)
 	c.serviceCode = configInfo["client.client_key"].(string)
-	c.acceptQueues = configInfo["mq.accept_queues"].(string)
+	c.acceptTopics = configInfo["mq.topic.accpet_topic"].(string)
 	c.webPort = configInfo["web.port"].(int)
 	tools.SetServiceCode(c.serviceCode)
 	return c

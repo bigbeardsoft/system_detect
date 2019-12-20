@@ -36,3 +36,25 @@ func (msv *MQService) Close() {
 		msv.msgqueue.Disconnect()
 	}
 }
+
+//SubscribeTopic 订阅主题消息
+// 参数:
+//    topicNames 切片,订阅主题名称
+// 返回:
+//    error: 订阅失败后返回错误
+func (msv *MQService) SubscribeTopic(topicNames []string) error {
+	if msv.msgqueue != nil {
+		return msv.msgqueue.SubscribeTopic(topicNames, msv.Callback)
+	}
+	return fmt.Errorf("连接未初始化")
+}
+
+//UnSubscribeTopic 取消订阅
+func (msv *MQService) UnSubscribeTopic(topicNames []string) {
+	if msv.msgqueue != nil {
+		for index := 0; index < len(topicNames); index++ {
+			msv.msgqueue.UnSubscriptTopic(topicNames[index])
+		}
+
+	}
+}

@@ -111,9 +111,9 @@ func (msgQueue *MsgQueue) send(queueName, msg string, conn *stomp.Conn) error {
 }
 
 //SendToTopic 发送主题信息
-func (msgQueue *MsgQueue) SendToTopic(queue, msg string, conn *stomp.Conn) error {
+func (msgQueue *MsgQueue) SendToTopic(queue, msg string) error {
 	queueName := fmt.Sprintf("%s%s", Topic, queue)
-	return msgQueue.send(queueName, msg, conn)
+	return msgQueue.send(queueName, msg, msgQueue.Connection)
 }
 
 //SendToQueue 发送消息到消息队列
@@ -175,7 +175,7 @@ func (msgQueue *MsgQueue) subscribe(queues []string, queueType string, callback 
 	if msgQueue.Connection == nil {
 		return fmt.Errorf("连接未初始化")
 	}
-	if queues == nil {
+	if queues == nil || len(queues) <= 0 {
 		logger.Warring("queues is nil")
 		return nil
 	}
@@ -183,13 +183,16 @@ func (msgQueue *MsgQueue) subscribe(queues []string, queueType string, callback 
 		msgQueue.Subs = list.New()
 	}
 	for index := range queues {
-		q := fmt.Sprintf("%s%s", queueType, queues[index])
-		sub, err := msgQueue.Connection.Subscribe(q, stomp.AckMode(stomp.AckAuto))
-		if nil == err {
-			msgQueue.Subs.PushBack(sub)
-			go msgQueue.receive(sub, callback)
-		} else {
-			return errorx.New(err)
+		qname := queues[index]
+		if qname != "" {
+			q := fmt.Sprintf("%s%s", queueType, queues[index])
+			sub, err := msgQueue.Connection.Subscribe(q, stomp.AckMode(stomp.AckAuto))
+			if nil == err {
+				msgQueue.Subs.PushBack(sub)
+				go msgQueue.receive(sub, callback)
+			} else {
+				return errorx.New(err)
+			}
 		}
 	}
 	return nil

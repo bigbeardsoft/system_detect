@@ -103,3 +103,6 @@ go code
 |HandlerCount|进程句柄数量|是||
 |NetWork|进程网络使用率|是||
 |PortInfo|进程打开的端口|是|多个端口逗号分开|
+
+# 配置说明
+health_config.yml文件放置在同级目录即可.才用yml格式配置.

@@ -1,17 +1,36 @@
 mq:
+  #activeMQ服务器IP地址
   ip: 192.168.0.245
+  #activeMQ服务器端口,使用的是ActimveMQ的Stomp协议
   port: 61613
+  #activeMQ服务器用户名
   user: admin
+  #activeMQ服务器密码
   pwd: admin
-  accept_queues: SPF100001
-  register_queue: IFS100001
-  status_queue: IFS100011
+  #侦听队列
+  queues:
+    #注册信息发送队列
+    register_queue: IFS100001
+    #状态发送队列
+    status_queue: IFS100011
+  topic:
+    #接收主题,多个逗号分割
+    accpet_topic: SPF100001
+#采集信息
 collect:
+  #采集间隔时间
   interval: 5
+#客户端信息
 client:
+  #客户端编号
   client_key: A3320000001
+#日志信息
 log:
+  #日志记录级别,debug,info,WARRING,ERROR
   loglevel: debug
+  #是否打印日志,true:打印,false:不打印
   showlog: true
+#web管理服务
 web:
+  #web服务端口
   port: 19001
