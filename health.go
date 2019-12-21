@@ -146,7 +146,7 @@ func readConfig() *appConfig {
 	c.registerQueue = configInfo["mq.queues.register_queue"].(string)
 	c.collectTimeInterval = configInfo["collect.interval"].(int)
 	c.serviceCode = configInfo["client.client_key"].(string)
-	c.acceptTopics = configInfo["mq.topic.accpet_topic"].(string)
+	c.acceptTopics = configInfo["mq.topic.accept_topic"].(string)
 	c.webPort = configInfo["web.port"].(int)
 	tools.SetServiceCode(c.serviceCode)
 	return c

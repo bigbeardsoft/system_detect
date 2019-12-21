@@ -15,7 +15,7 @@ mq:
     status_queue: IFS100011
   topic:
     #接收主题,多个逗号分割
-    accpet_topic: SPF100001
+    accept_topic: SPF100001
 #采集信息
 collect:
   #采集间隔时间
