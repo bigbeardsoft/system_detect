@@ -1,7 +1,7 @@
 mq:
   #activeMQ服务器IP地址
   ip: 192.168.0.245
-  #activeMQ服务器端口,使用的是ActimveMQ的Stomp协议
+  #activeMQ服务器端口,使用的是ActiveMQ的Stomp协议
   port: 61613
   #activeMQ服务器用户名
   user: admin
